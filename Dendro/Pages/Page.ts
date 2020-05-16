@@ -1,21 +1,10 @@
-import {ServerRequest} from "https://deno.land/std@0.50.0/http/server.ts";
-import {HomePage} from "./HomePage.ts";
+import { ServerRequest } from "https://deno.land/std@0.50.0/http/server.ts";
+import { HomePage } from "./HomePage.ts";
 
 export abstract class Page {
+	/**
+	 * name
+	 */
 
-
-    /**
-     * name
-     */
-
-
-    public abstract getResponse(): Object;
-
-
+	public abstract getResponse(): Object;
 }
-
-
-
-
-
-
