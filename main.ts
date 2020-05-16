@@ -1,6 +1,6 @@
 import {serve, ServerRequest} from "https://deno.land/std@0.50.0/http/server.ts";
-import {route, linkRoute} from "../Dendro/Routes/Router.ts";
-import {HomePage} from "../Dendro/Pages/HomePage.ts"
+import {route, linkRoute} from "./Dendro/Routes/Router.ts";
+import {HomePage} from "./Dendro/Pages/HomePage.ts"
 
 
 const s = serve({port: 8000});
