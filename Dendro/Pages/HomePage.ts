@@ -26,3 +26,9 @@ export class Page404 extends Page {
 		return { body: "404", status: 404 };
 	}
 }
+
+export class Page500 extends Page {
+	public getResponse(): Object {
+		return { body: "404", status: 500 };
+	}
+}
