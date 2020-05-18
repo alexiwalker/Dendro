@@ -5,9 +5,9 @@ import {
 } from "https://deno.land/std@0.50.0/http/server.ts";
 
 // @ts-ignore
-import { Router, RouteValidator } from "./Routes/mod.ts";
+import { BasicRouter, RouteValidator, IRouter } from "./Routes/mod.ts";
 import { ILogger } from "./Util/mod.ts";
-import { Page404 } from "./Pages/mod.ts";
+import { Page5XX } from "./Pages/mod.ts";
 import { Page } from "./Pages/mod.ts";
 
 //As all RouteValidators and RoutePagers require ServerRequest, it is also exported here even if it is imported via other files
@@ -20,7 +20,7 @@ export declare type PageProvider = (request: ServerRequest) => Page;
 export class Dendro {
 	// declare type ErrorHandler = (ex:Error):void;
 	public port: number;
-	public router: Router;
+	public router: IRouter;
 	public server: Server | null;
 	private logger: ILogger | null;
 	private errorHandler: ErrorHandler | null;
@@ -29,13 +29,13 @@ export class Dendro {
 
 	constructor(port: number) {
 		this.port = port;
-		this.router = new Router();
+		this.router = new BasicRouter();
 		this.server = null;
 		this.logger = null;
 		this.errorHandler = null;
 		this._logAllErrors = false;
 		this.onErrorPager = (req: ServerRequest) => {
-			return new Page404();
+			return new Page5XX(500);
 		};
 	}
 
@@ -66,6 +66,10 @@ export class Dendro {
 
 	public usesErrorHandler(errorhandler: ErrorHandler) {
 		this.errorHandler = errorhandler;
+	}
+
+	public usesRouter(router: IRouter) {
+		this.router = router;
 	}
 
 	public log(data: string) {

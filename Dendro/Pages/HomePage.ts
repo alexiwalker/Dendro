@@ -21,14 +21,36 @@ export class HomePage extends Page {
 	}
 }
 
-export class Page404 extends Page {
+export class Page4XX extends Page {
+	statusCode: number = 400;
+
+	constructor(status: number) {
+		super();
+		if (!(this.statusCode >= 400 && this.statusCode < 500)) {
+			throw new RangeError("non-4XX value provided for 4XX error page");
+		}
+		this.statusCode = status;
+	}
+
 	public getResponse(): Object {
-		return { body: "404", status: 404 };
+		//Todo: error code template
+		return { body: this.statusCode.toString(), status: this.statusCode };
 	}
 }
 
-export class Page500 extends Page {
+export class Page5XX extends Page {
+	statusCode: number = 500;
+
+	constructor(status: number) {
+		super();
+		if (!(this.statusCode >= 500 && this.statusCode < 600)) {
+			throw new RangeError("non-4XX value provided for 4XX error page");
+		}
+		this.statusCode = status;
+	}
+
 	public getResponse(): Object {
-		return { body: "404", status: 500 };
+		//Todo: error code template
+		return { body: this.statusCode.toString(), status: this.statusCode };
 	}
 }

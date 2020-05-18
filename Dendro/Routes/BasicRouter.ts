@@ -1,14 +1,12 @@
 import { ServerRequest } from "https://deno.land/std@0.50.0/http/server.ts";
 
-import { Page } from "../Pages/Page.ts";
-import { HomePage, Page404 } from "../Pages/HomePage.ts";
+import { Page, Page4XX } from "../Pages/mod.ts";
 
-export declare type RouteValidator = (request: ServerRequest) => boolean;
+import { IRouter, RouteValidator, RouteMap } from "./IRouter.ts";
+
 import { PageProvider } from "../Dendro.ts";
 
-export declare type RouteMap = Map<RouteValidator, PageProvider>;
-
-export class Router {
+export class BasicRouter implements IRouter {
 	routes: RouteMap = new Map<RouteValidator, PageProvider>();
 
 	constructor() {}
@@ -22,6 +20,6 @@ export class Router {
 			if (key(request)) return value(request);
 		}
 
-		return new Page404();
+		return new Page4XX(404);
 	}
 }
