@@ -29,9 +29,10 @@ The RouteValidator is a test to determine if the server request matches the requ
 
 Example usage:
 
+    let App = new Dendro(8000);
 
-    let isHome = (req:ServerRequest) => req.url=="/"  
+    let isHome = (req: ServerRequest) => req.url == "/";
 
-    linkRoute(isHome, HomePage.Get)
+    App.linkRoute(isHome, HomePage.Get);
     
 HomePage.get is a static function on the HomePage class that accesses its private constructor to provide the page, and the isHome function simply tests if the url accessed has nothing following it. There are no requirements for how a route is validated, but they are evaluated in the other in which they are added.
