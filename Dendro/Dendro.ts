@@ -1,17 +1,18 @@
-import {
-	serve,
-	ServerRequest,
-	Server,
-} from "https://deno.land/std@0.50.0/http/server.ts";
+// @ts-ignore
+import { serve, ServerRequest, Server } from 'https://deno.land/std@0.50.0/http/server.ts';
 
 // @ts-ignore
-import { BasicRouter, RouteValidator, IRouter } from "./Routes/mod.ts";
-import { ILogger } from "./Util/mod.ts";
-import { Page5XX } from "./Pages/mod.ts";
-import { Page } from "./Pages/mod.ts";
+import { BasicRouter, RouteValidator, IRouter } from './Routes/mod.ts';
+
+// @ts-ignore
+import { ILogger } from './Util/mod.ts';
+
+// @ts-ignore
+import { Page5XX , Page} from './Pages/mod.ts';
 
 //As all RouteValidators and RoutePagers require ServerRequest, it is also exported here even if it is imported via other files
 //Useful for 3rd parties working with Dendro, but not needed internalluy
+// @ts-ignore
 export { ServerRequest } from "https://deno.land/std@0.50.0/http/server.ts";
 
 export declare type ErrorHandler = (error: Error) => void;
@@ -39,8 +40,16 @@ export class Dendro {
 		};
 	}
 
-	linkRoute = (validator: RouteValidator, pager: PageProvider) =>
-		this.router.linkRoute(validator, pager);
+	linkRoute(validator: RouteValidator, pager: PageProvider) {
+		if (this.router instanceof BasicRouter) {
+			let router = this.router as BasicRouter;
+			router.linkRoute(validator, pager);
+		} else {
+			throw new TypeError(
+				"method linkRoute is only available for BasicRouter. Routes must be added to custom routers via the router object, not through a Dendro object"
+			);
+		}
+	}
 
 	/**
 	 * Serve

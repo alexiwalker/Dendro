@@ -11,8 +11,26 @@ export class BasicRouter implements IRouter {
 
 	constructor() {}
 
-	public linkRoute(validator: RouteValidator, pager: PageProvider): void {
-		this.routes.set(validator, pager);
+	public linkRoute(validator: RouteValidator, page: PageProvider): void {
+		this.routes.set(validator, page);
+	}
+
+	public url(url: string, page: PageProvider, checkParams: boolean = false): void {
+		var fn: RouteValidator;
+
+		if (!checkParams) {
+			fn = (req: ServerRequest) => {
+				if (req.url.split("?")[0] == url) return true;
+				return false;
+			};
+		} else {
+			fn = (req: ServerRequest) => {
+				if (req.url == url) return true;
+				return false;
+			};
+		}
+
+		this.linkRoute(fn, page);
 	}
 
 	route(request: ServerRequest): Page {

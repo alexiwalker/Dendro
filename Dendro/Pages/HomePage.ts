@@ -10,8 +10,7 @@ export class HomePage extends Page {
 	}
 
 	public getResponse(): Object {
-		let Rbody =
-			"hi! This request was sent with method: " + this._request.method;
+		let Rbody = "hi! This request was sent with method: " + this._request.method + " and the url used was: " + this._request.url;
 
 		return { body: Rbody, status: 200 };
 	}

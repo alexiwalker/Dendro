@@ -1,9 +1,9 @@
-import { RouteValidator, RouteMap } from "./Dendro/Routes/mod.ts";
-import { ServerRequest, PageProvider } from "./Dendro/Dendro.ts";
-import { HomePage, Page } from "./Dendro/Pages/mod.ts";
+import {RouteValidator, RouteMap} from "./Dendro/Routes/mod.ts";
+import {ServerRequest, PageProvider} from "./Dendro/Dendro.ts";
+import {HomePage, Page} from "./Dendro/Pages/mod.ts";
 
-let contentTypeJS = (req: ServerRequest) => req.url.endsWith(".js");
-let contentTypeCSS = (req: ServerRequest) => req.url.endsWith(".css");
+var contentTypeJS: RouteValidator = (req: ServerRequest) => req.url.endsWith(".js");
+var contentTypeCSS: RouteValidator = (req: ServerRequest) => req.url.endsWith(".css");
 
 export class ContentPage extends Page {
 	public getResponse(): Object {
