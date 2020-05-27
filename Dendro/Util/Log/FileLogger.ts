@@ -2,6 +2,7 @@
 import { ILogger } from "./ILogger.ts";
 
 export class FileLogger implements ILogger {
+	implements: String[] = ["ILogger", "FileLogger"];
 	outputFileName!: string;
 
 	FileLogger(file: string) {

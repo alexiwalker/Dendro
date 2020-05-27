@@ -1,24 +1,4 @@
-import { Page } from "./Page.ts";
-import { ServerRequest } from "https://deno.land/std@0.50.0/http/server.ts";
-
-export class HomePage extends Page {
-	_request: ServerRequest;
-
-	private constructor(request: ServerRequest) {
-		super();
-		this._request = request;
-	}
-
-	public getResponse(): Object {
-		let Rbody = "hi! This request was sent with method: " + this._request.method + " and the url used was: " + this._request.url;
-
-		return { body: Rbody, status: 200 };
-	}
-
-	static Get(request: ServerRequest): Page {
-		return new HomePage(request);
-	}
-}
+import { Page } from "./mod.ts";
 
 export class Page4XX extends Page {
 	statusCode: number = 400;
@@ -32,7 +12,6 @@ export class Page4XX extends Page {
 	}
 
 	public getResponse(): Object {
-		//Todo: error code template
 		return { body: this.statusCode.toString(), status: this.statusCode };
 	}
 }
@@ -49,7 +28,6 @@ export class Page5XX extends Page {
 	}
 
 	public getResponse(): Object {
-		//Todo: error code template
 		return { body: this.statusCode.toString(), status: this.statusCode };
 	}
 }

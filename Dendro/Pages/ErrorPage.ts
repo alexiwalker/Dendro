@@ -7,7 +7,7 @@ export class ErrorPage extends Page {
 		throw new Error("Method not implemented.");
 	}
 
-	static Get(request: ServerRequest): Page {
-		throw new StatusError(500);
+	static new(request: ServerRequest): Page {
+		throw new StatusError(501);
 	}
 }

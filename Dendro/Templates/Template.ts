@@ -1,3 +1,5 @@
+//I swear to god i'll get around to doing this one day.I have a lot of stuff to port over from BlueFrame lol
+
 export class Template {
 	private _baseFile: string;
 

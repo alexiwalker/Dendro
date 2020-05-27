@@ -6,22 +6,22 @@ import { BasicRouter } from "./Dendro/Routes/mod.ts";
 let App: Dendro = new Dendro(8000);
 let router: BasicRouter = new BasicRouter();
 
-App.usesRouter(router);
+App.uses(router);
+
 let isHome = (req: ServerRequest) => req.url == "/";
 
 let isError = (req: ServerRequest) => req.url == "/error";
 
-router.linkRoute(isHome, HomePage.Get);
-router.linkRoute(isError, ErrorPage.Get);
-router.url("/urltest", HomePage.Get, true);
-// router.url("/urltest", ErrorPage.Get, false);
+router.linkRoute(isHome, HomePage.new);
+router.linkRoute(isError, ErrorPage.new);
+router.url("/urltest", HomePage.new, true);
 
-App.usesErrorHandler((error: Error) => {
+App.uses((error: Error) => {
 	console.log("Handling error...");
 });
 
-App.usesLogger(new ConsoleLogger());
+App.uses(new ConsoleLogger());
 
-App.logAllErrors(true);
+App.logAllErrors = true;
 
 await App.Serve();
