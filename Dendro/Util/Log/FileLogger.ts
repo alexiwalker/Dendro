@@ -1,21 +1,31 @@
 // import { writeFileStrSync } from "https://deno.land/std@0.51.0/fs/mod.ts";
 import { ILogger } from "./ILogger.ts";
 
+//todo: implement this when deno IO stops erroring on me?
 export class FileLogger implements ILogger {
-	implements: String[] = ["ILogger", "FileLogger"];
 	outputFileName!: string;
 
-	FileLogger(file: string) {
-		// this.outputFileName = file;
+	Critical(data: string): void {
+		//File.write("Critical.log", data);
 	}
 
-	LogString(data: string): void {
-		// writeFileStrSync(this.outputFileName, data);
+	Error(data: string): void {
+		//File.write("Error.log", data);
 	}
 
-	LogError(data: Error): void {
-		// if (data.stack?.toString != null) {
-		// 	this.LogString(data.stack.toString());
-		// }
+	Info(data: string): void {
+		//File.write("Critical.log", data);
 	}
+
+	Log(data: string): void;
+	Log(data: Error): void;
+	Log(data: string | Error): void {
+		if (typeof data === "string") {
+			//File.write("Critical.log", data);
+		} else if (data instanceof Error) {
+			//File.write("Critical.log", data);
+		}
+	}
+
+	Warning(data: string): void {}
 }

@@ -5,18 +5,18 @@ import { Page, Page4XX } from "../Pages/mod.ts";
 import { IRouter, RouteValidator, RouteMap } from "./IRouter.ts";
 
 import { PageProvider } from "../Dendro.ts";
+import { RequestEnvironment } from "../Util/RequestEnvironment.ts";
 
 //for method-based routing
-const Post: string = "POST";
-const Put: string = "PUT";
-const Get: string = "GET";
-const Delete: string = "DELETE";
+export const Post: string = "POST";
+export const Put: string = "PUT";
+export const Get: string = "GET";
+export const Delete: string = "DELETE";
 
 export class BasicRouter implements IRouter {
 	routes: RouteMap = new Map<RouteValidator, PageProvider>();
 
 	constructor() {}
-	implements: String[] = ["IRouter", "BasicRouter"];
 
 	public linkRoute(validator: RouteValidator, page: PageProvider): void {
 		this.routes.set(validator, page);
@@ -70,9 +70,9 @@ export class BasicRouter implements IRouter {
 		return fn;
 	}
 
-	route(request: ServerRequest): Page {
+	route(requestEnvironment: RequestEnvironment): Page {
 		for (let [key, value] of this.routes) {
-			if (key(request)) return value(request);
+			if (key(requestEnvironment.request)) return value(requestEnvironment);
 		}
 
 		return new Page4XX(404);

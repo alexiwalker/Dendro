@@ -5,7 +5,7 @@ export class Template {
 
 	public content: string = "";
 
-	conditionalPattern: RegExp = new RegExp("({{@ifs*?[([A-z]*?)]s*?(([^){]*?))s*?elses*?(([^)]*?))}})");
+	conditionalPattern: RegExp = new RegExp("({{@ifs*?[([A-z]*?)]s*?(([^){]*?))s*?elses*?([^)]*?)}}");
 	includePattern: RegExp = new RegExp('({{@includes"[A-Za-z0-9.\\/]+"}})');
 	includeOncePatter: RegExp = new RegExp('({{@includeonces"[A-Za-z0-9.\\/]+"}})');
 	replacersPattern: RegExp = new RegExp("([[[A-Za-z0-9]+]])");
@@ -20,7 +20,7 @@ export class Template {
 	}
 
 	/**
-	 * Async constructor wrapper to allow async reading of template from the filesystem
+	 * Async factory to allow async reading of template from the filesystem
 	 */
 	public static async CreateAsync(file: string): Promise<Template> {
 		let t = new Template(file);
@@ -30,10 +30,11 @@ export class Template {
 	}
 
 	/**
-	 * Syncronous equivalent of CreateAsync, with a blocking file IO operation. Not recommended
+	 * Syncronous factory with a blocking file IO operation. Not recommended. May throw if file is not found or could not be read
 	 */
 	public static CreateSync(file: string): Template {
 		let t = new Template(file);
+
 		const decoder = new TextDecoder("utf-8");
 		t.content = decoder.decode(Deno.readFileSync(t._baseFile));
 		return t;

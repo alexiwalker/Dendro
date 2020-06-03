@@ -1,12 +1,15 @@
 import { Page } from "./Page.ts";
 import { ServerRequest } from "https://deno.land/std@0.50.0/http/server.ts";
+import { RequestEnvironment } from "../Util/RequestEnvironment.ts";
 
 export class HomePage extends Page {
 	_request: ServerRequest;
+	_environment: RequestEnvironment;
 
-	private constructor(request: ServerRequest) {
+	private constructor(requestEnvironment: RequestEnvironment) {
 		super();
-		this._request = request;
+		this._environment = requestEnvironment;
+		this._request = requestEnvironment.request;
 	}
 
 	public getResponse(): Object {
@@ -15,17 +18,19 @@ export class HomePage extends Page {
 		return { body: Rbody, status: 200 };
 	}
 
-	static new(request: ServerRequest): Page {
-		return new HomePage(request);
+	static new(environment: RequestEnvironment): Page {
+		return new HomePage(environment);
 	}
 }
 
 export class basicGet extends Page {
 	_request: ServerRequest;
+	_environment: RequestEnvironment;
 
-	private constructor(request: ServerRequest) {
+	private constructor(env: RequestEnvironment) {
 		super();
-		this._request = request;
+		this._environment = env;
+		this._request = env.request;
 	}
 
 	public getResponse(): Object {
@@ -34,16 +39,18 @@ export class basicGet extends Page {
 		return { body: Rbody, status: 200 };
 	}
 
-	static new(request: ServerRequest): Page {
-		return new basicGet(request);
+	static new(env: RequestEnvironment): Page {
+		return new basicGet(env);
 	}
 }
 export class basicPut extends Page {
 	_request: ServerRequest;
+	_environment: RequestEnvironment;
 
-	private constructor(request: ServerRequest) {
+	private constructor(env: RequestEnvironment) {
 		super();
-		this._request = request;
+		this._environment = env;
+		this._request = env.request;
 	}
 
 	public getResponse(): Object {
@@ -52,16 +59,18 @@ export class basicPut extends Page {
 		return { body: Rbody, status: 200 };
 	}
 
-	static new(request: ServerRequest): Page {
-		return new basicPut(request);
+	static new(env: RequestEnvironment): Page {
+		return new basicPut(env);
 	}
 }
 export class basicPost extends Page {
 	_request: ServerRequest;
+	_environment: RequestEnvironment;
 
-	private constructor(request: ServerRequest) {
+	private constructor(env: RequestEnvironment) {
 		super();
-		this._request = request;
+		this._environment = env;
+		this._request = env.request;
 	}
 
 	public getResponse(): Object {
@@ -70,16 +79,18 @@ export class basicPost extends Page {
 		return { body: Rbody, status: 200 };
 	}
 
-	static new(request: ServerRequest): Page {
-		return new basicPost(request);
+	static new(env: RequestEnvironment): Page {
+		return new basicPost(env);
 	}
 }
 export class basicDelete extends Page {
 	_request: ServerRequest;
+	_environment: RequestEnvironment;
 
-	private constructor(request: ServerRequest) {
+	private constructor(env: RequestEnvironment) {
 		super();
-		this._request = request;
+		this._environment = env;
+		this._request = env.request;
 	}
 
 	public getResponse(): Object {
@@ -88,7 +99,7 @@ export class basicDelete extends Page {
 		return { body: Rbody, status: 200 };
 	}
 
-	static new(request: ServerRequest): Page {
-		return new basicDelete(request);
+	static new(env: RequestEnvironment): Page {
+		return new basicDelete(env);
 	}
 }
