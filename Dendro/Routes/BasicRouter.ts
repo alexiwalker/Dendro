@@ -72,10 +72,10 @@ export class BasicRouter implements IRouter {
 
 	route(requestEnvironment: RequestEnvironment): Page {
 		for (let [key, value] of this.routes) {
+			// for(var ware of value[1]){
+			// 	ware(requestEnvironment)
+			// }
 			if (key(requestEnvironment.request)){
-				for(var ware of value[1]){
-					ware(requestEnvironment)
-				}
 				return value[0](requestEnvironment);
 			}
 		}

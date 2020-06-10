@@ -11,4 +11,5 @@ export declare type Router = IRouter;
 export interface IRouter {
 	route(requestEnvironment: RequestEnvironment): Page;
 	linkRoute(validator: RouteValidator, pager: PageProvider): void;
+	routes:RouteMap;
 }

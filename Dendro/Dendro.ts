@@ -137,6 +137,13 @@ export class Dendro {
 						await this.beforeRequest[i](env);
 					}
 
+					var routeMap = this.router.routes;
+					for (let [, value] of routeMap) {
+						for(var ware of value[1]){
+							ware(env)
+						}
+					}
+
 					req.respond(this.router.route(env).getResponse());
 
 					for (let i = 0; i < this.afterRequest.length; i++) {
