@@ -3,15 +3,15 @@ import { ILogger } from "./ILogger.ts";
 
 export class ConsoleLogger implements ILogger {
 	Critical(data: string): void {
-		// console.log(data, "\033[93m");
+		console.log("Critical Log: " + data);
 	}
 
 	Error(data: string): void {
-		// console.log(data, "\033[93m");
+		console.log("Error Logged: " + data);
 	}
 
 	Info(data: string): void {
-		// console.log(data, "color: blue");
+		console.log("Info: " + data);
 	}
 
 	Log(data: string): void;

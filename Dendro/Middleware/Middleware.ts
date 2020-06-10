@@ -1,8 +1,14 @@
 import { MiddleWare, ServerRequest } from "../Dendro.ts";
 import { RequestEnvironment } from "../Util/RequestEnvironment.ts";
 import { MiddlewareError } from "../Util/Err/MiddlewareError.ts";
+import {Delete,Get,Post,Put} from "../Routes/BasicRouter.ts" ;
 
 export var DecodeBodyJSON: MiddleWare = async function (env: RequestEnvironment) {
+
+	//right now, only allow it to attempt to decode a post request
+	if (env.request.method == Post)
+		return;
+
 	try {
 		let req: ServerRequest = env.request;
 		let len = req.contentLength as number;
@@ -27,10 +33,6 @@ export var DecodeBodyJSON: MiddleWare = async function (env: RequestEnvironment)
 
 		env.environmentVars.set("body", obj);
 	} catch (e) {
-		if (e instanceof Error) {
-			throw new MiddlewareError(e.message);
-		} else {
-			// throw e;
-		}
+		//No Json in body to decode. Which is fine. Sometimes. It shouldn't let an error bubble up; a page requiring post data should do that instead
 	}
 };

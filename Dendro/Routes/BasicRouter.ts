@@ -4,7 +4,7 @@ import { Page, Page4XX } from "../Pages/mod.ts";
 
 import { IRouter, RouteValidator, RouteMap } from "./IRouter.ts";
 
-import { PageProvider } from "../Dendro.ts";
+import {MiddleWare, PageProvider} from "../Dendro.ts";
 import { RequestEnvironment } from "../Util/RequestEnvironment.ts";
 
 //for method-based routing
@@ -14,15 +14,15 @@ export const Get: string = "GET";
 export const Delete: string = "DELETE";
 
 export class BasicRouter implements IRouter {
-	routes: RouteMap = new Map<RouteValidator, PageProvider>();
+	routes: RouteMap = new Map<RouteValidator, [PageProvider,MiddleWare[]]>();
 
 	constructor() {}
 
-	public linkRoute(validator: RouteValidator, page: PageProvider): void {
-		this.routes.set(validator, page);
+	public linkRoute(validator: RouteValidator, page: PageProvider, Middleware:MiddleWare[] = []): void {
+		this.routes.set(validator, [page,Middleware]);
 	}
 
-	public url(url: string, page: PageProvider, checkParams: boolean = false): void {
+	public url(url: string, page: PageProvider, checkParams: boolean = false, middleWare:MiddleWare[] = []): void {
 		let fn: RouteValidator;
 
 		if (!checkParams) {
@@ -35,23 +35,23 @@ export class BasicRouter implements IRouter {
 			};
 		}
 
-		this.linkRoute(fn, page);
+		this.linkRoute(fn, page, middleWare);
 	}
 
-	public get(url: string, page: PageProvider, checkParams: boolean = false) {
-		this.linkRoute(BasicRouter._method(url, checkParams, Get), page);
+	public get(url: string, page: PageProvider, checkParams: boolean = false,middleWare:MiddleWare[] = []) {
+		this.linkRoute(BasicRouter._method(url, checkParams, Get), page,middleWare);
 	}
 
-	public post(url: string, page: PageProvider, checkParams: boolean = false) {
-		this.linkRoute(BasicRouter._method(url, checkParams, Post), page);
+	public post(url: string, page: PageProvider, checkParams: boolean = false,middleWare:MiddleWare[] = []) {
+		this.linkRoute(BasicRouter._method(url, checkParams, Post), page,middleWare);
 	}
 
-	public put(url: string, page: PageProvider, checkParams: boolean = false) {
-		this.linkRoute(BasicRouter._method(url, checkParams, Put), page);
+	public put(url: string, page: PageProvider, checkParams: boolean = false,middleWare:MiddleWare[] = []) {
+		this.linkRoute(BasicRouter._method(url, checkParams, Put), page,middleWare);
 	}
 
-	public delete(url: string, page: PageProvider, checkParams: boolean = false) {
-		this.linkRoute(BasicRouter._method(url, checkParams, Delete), page);
+	public delete(url: string, page: PageProvider, checkParams: boolean = false,middleWare:MiddleWare[] = []) {
+		this.linkRoute(BasicRouter._method(url, checkParams, Delete), page,middleWare);
 	}
 
 	private static _method(url: string, checkParams: boolean = false, method: string): RouteValidator {
@@ -72,7 +72,12 @@ export class BasicRouter implements IRouter {
 
 	route(requestEnvironment: RequestEnvironment): Page {
 		for (let [key, value] of this.routes) {
-			if (key(requestEnvironment.request)) return value(requestEnvironment);
+			if (key(requestEnvironment.request)){
+				for(var ware of value[1]){
+					ware(requestEnvironment)
+				}
+				return value[0](requestEnvironment);
+			}
 		}
 
 		return new Page4XX(404);
