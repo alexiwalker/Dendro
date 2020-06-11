@@ -130,6 +130,7 @@ export class Dendro {
 				let env: RequestEnvironment = new RequestEnvironment(req);
 
 				try {
+					//Serve generic pre-request middleware
 					for (let i = 0; i < this.beforeRequest.length; i++) {
 						//despite VSC saying await has no effect here, it actually can
 						//because the FN pointer may be async; if it throws and no await, the error wont be caught
@@ -137,10 +138,14 @@ export class Dendro {
 						await this.beforeRequest[i](env);
 					}
 
+					//Serve Route-specific middleware
 					var routeMap = this.router.routes;
-					for (let [, value] of routeMap) {
-						for(var ware of value[1]){
-							ware(env)
+					for (let [key, value] of routeMap) {
+						//value = [PageProvider,MiddleWare[]]
+						if (key(env.request)){
+							for(var middleware of value[1]){
+								await middleware(env)
+							}
 						}
 					}
 

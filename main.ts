@@ -20,22 +20,16 @@ router.url("/", HomePage.new, false, [
 	(env: RequestEnvironment) => {
 		App.log("Serving first route-specific middleware: " + env.request.url);
 	},
-	(env: RequestEnvironment) => {
-		App.log("Serving Secondary route-specific middleware: " + env.request.method)
-	},
-	(env: RequestEnvironment) => {
-		//this url, / , will now be routed by the page provider for /test instead of / even though it specifies HomePage.new
-		//use case: conditional url rewriting  eg (if(somebodycontentcheck() == 1) url="/test"
-		env.request.url="/test";
-	     //throws in this context are safe and are handled by the default error handler
+	() => {
 		throw new Error("Unknown Error")
-	},
-	(env: RequestEnvironment) => {
-		App.log("This will never execute, as an error has been thrown above")
 	},
 ])
 
-router.url("/test", basicGet.new,)
+router.url("/test", basicGet.new,false,[
+	(env:RequestEnvironment) => {
+		App.log("This should only execute for /Test. Current url: " + env.request.url)
+	},
+])
 
 router.linkRoute(contentTypeCSS, StaticCSS.new)
 router.linkRoute(contentTypeJS, StaticJS.new)
