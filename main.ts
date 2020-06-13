@@ -1,4 +1,4 @@
-import {Dendro, ServerRequest, MiddleWare} from "./Dendro/Dendro.ts";
+import {Dendro} from "./Dendro/Dendro.ts";
 import {ConsoleLogger} from "./Dendro/Util/Log/ConsoleLogger.ts";
 import {BasicRouter} from "./Dendro/Routes/mod.ts";
 import {RequestEnvironment} from "./Dendro/Util/RequestEnvironment.ts";
@@ -18,7 +18,11 @@ let App: Dendro = new Dendro(PORT);
 let router: BasicRouter = new BasicRouter();
 App.usesRouter(router);
 
-router.addRoute(new Route(Route.url("/trout"), HomePage.new))
+
+//todo: works well enough but kinda ugly. Refactor to smooth this section out a bit but still use the Route object approach
+router.addRoute(new Route(Route.url("/testroute"), HomePage.new))
+
+
 router.addRoute(new Route(Route.url("/"), HomePage.new, [
 	(env: RequestEnvironment) => {
 		App.log("Serving first route-specific middleware: " + env.request.url);
@@ -28,10 +32,11 @@ router.addRoute(new Route(Route.url("/"), HomePage.new, [
 
 router.url("/test", basicGet.new)
 
-router.linkRoute(contentTypeCSS, StaticCSS.new)
-router.linkRoute(contentTypeJS, StaticJS.new)
+router.addRoute(new Route(contentTypeCSS, StaticCSS.new))
+router.addRoute(new Route(contentTypeJS, StaticJS.new))
 
 App.usesMiddleware((env: RequestEnvironment) => {
+	App.log("Pre Request: ")
 	App.logger.Info(env.request.url);
 });
 
@@ -41,7 +46,7 @@ App.usesMiddleware((env: RequestEnvironment) => {
 
 
 App.usesErrorHandler((error: Error) => {
-	console.log("Handling error...");
+	App.log("Handling error...");
 });
 
 App.usesLogger(new ConsoleLogger());

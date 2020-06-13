@@ -1,5 +1,5 @@
 // @ts-ignore
-import { serve, ServerRequest, Server } from "https://deno.land/std@0.50.0/http/server.ts";
+import { serve,  Server } from "https://deno.land/std@0.50.0/http/server.ts";
 
 // @ts-ignore
 import { BasicRouter, RouteValidator, IRouter, Router } from "./Routes/mod.ts";
@@ -10,6 +10,7 @@ import { ILogger, Logger } from "./Util/mod.ts";
 // @ts-ignore
 import { Page5XX, Page } from "./Pages/mod.ts";
 import { RequestEnvironment } from "./Util/RequestEnvironment.ts";
+import {Route} from "./Routes/Route.ts";
 
 //As all RouteValidators and RoutePagers require ServerRequest, it is also exported here even if it is imported via other files
 //Useful for 3rd parties working with Dendro, but not needed internalluy
@@ -64,7 +65,7 @@ export class Dendro {
 	linkRoute(validator: RouteValidator, pager: PageProvider) {
 		if (this.router instanceof BasicRouter) {
 			let router = this.router as BasicRouter;
-			router.linkRoute(validator, pager);
+			router.addRoute(new Route(validator, pager));
 		} else {
 			throw new TypeError(
 				"method linkRoute is only available for BasicRouter. Routes must be added to custom routers via the router object, not through a Dendro object"
@@ -72,10 +73,10 @@ export class Dendro {
 		}
 	}
 
-	public get(url: string, page: PageProvider, checkParams: boolean = false) {
+	public get(url: string, page: PageProvider, middleWare:MiddleWare[] = [],checkParams: boolean = false) {
 		if (this.router instanceof BasicRouter) {
 			let router = this.router as BasicRouter;
-			router.get(url, page, checkParams);
+			router.get(url, page,middleWare, checkParams);
 		} else {
 			throw new TypeError(
 				"method 'get' is only available for the default DendroRouter. Routes must be added to custom routers via the router object, not through a Dendro object"
@@ -83,21 +84,21 @@ export class Dendro {
 		}
 	}
 
-	public post(url: string, page: PageProvider, checkParams: boolean = false) {
+	public post(url: string, page: PageProvider, middleWare:MiddleWare[] = [],checkParams: boolean = false) {
 		if (this.router instanceof BasicRouter) {
 			let router = this.router as BasicRouter;
-			router.post(url, page, checkParams);
+			router.post(url, page,middleWare, checkParams);
 		} else {
 			throw new TypeError(
-				"method 'post' is only available for the default DendroRouter. Routes must be added to custom routers via the router object, not through a Dendro object"
+				"method 'post' is only available for the default Dendro Router. Routes must be added to custom routers via the router object, not through a Dendro object"
 			);
 		}
 	}
 
-	public put(url: string, page: PageProvider, checkParams: boolean = false) {
+	public put(url: string, page: PageProvider, middleWare:MiddleWare[] = [],checkParams: boolean = false) {
 		if (this.router instanceof BasicRouter) {
 			let router = this.router as BasicRouter;
-			router.put(url, page, checkParams);
+			router.put(url, page,middleWare, checkParams);
 		} else {
 			throw new TypeError(
 				"method 'put' is only available for the default DendroRouter. Routes must be added to custom routers via the router object, not through a Dendro object"
@@ -105,10 +106,10 @@ export class Dendro {
 		}
 	}
 
-	public delete(url: string, page: PageProvider, checkParams: boolean = false) {
+	public delete(url: string, page: PageProvider, middleWare:MiddleWare[] = [],checkParams: boolean = false) {
 		if (this.router instanceof BasicRouter) {
 			let router = this.router as BasicRouter;
-			router.delete(url, page, checkParams);
+			router.delete(url, page,middleWare, checkParams);
 		} else {
 			throw new TypeError(
 				"method 'delete' is only available for the default DendroRouter. Routes must be added to custom routers via the router object, not through a Dendro object"
@@ -138,21 +139,9 @@ export class Dendro {
 						await this.beforeRequest[i](env);
 					}
 
-					//Serve Route-specific middleware
-					// var routeMap = this.router.routes;
-					// for (let [key, value] of routeMap) {
-					// 	//value = [PageProvider,MiddleWare[]]
-					// 	if (key(env.request)){
-					// 		for(var middleware of value[1]){
-					// 			await middleware(env)
-					// 		}
-					// 	}
-					// }
-
 					req.respond((await this.router.RouteRequest(env)).getResponse());
 
 					for (let i = 0; i < this.afterRequest.length; i++) {
-						//await: same as beforeRequest
 						await this.afterRequest[i](env);
 					}
 				} catch (error) {

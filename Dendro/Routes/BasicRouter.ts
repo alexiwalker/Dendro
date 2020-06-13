@@ -2,7 +2,7 @@ import { ServerRequest } from "https://deno.land/std@0.50.0/http/server.ts";
 
 import { Page, Page4XX } from "../Pages/mod.ts";
 
-import {IRouter, RouteValidator, RouteMap, RouteList} from "./IRouter.ts";
+import {IRouter, RouteValidator, RouteList} from "./IRouter.ts";
 
 import {MiddleWare, PageProvider} from "../Dendro.ts";
 import { RequestEnvironment } from "../Util/RequestEnvironment.ts";
@@ -15,7 +15,6 @@ export const Get: string = "GET";
 export const Delete: string = "DELETE";
 
 export class BasicRouter implements IRouter {
-	// routes: RouteMap = new Map<RouteValidator, [PageProvider,MiddleWare[]]>();
 	routeList:RouteList = new Array<Route>();
 
 	constructor() {}
@@ -24,7 +23,7 @@ export class BasicRouter implements IRouter {
 		this.routeList.push(route)
     }
 
-	public linkRoute(validator: RouteValidator, page: PageProvider, Middleware:MiddleWare[] = []): void {
+	private linkRoute(validator: RouteValidator, page: PageProvider, Middleware:MiddleWare[] = []): void {
 		this.addRoute(new Route(validator, page,Middleware));
 	}
 
@@ -44,19 +43,19 @@ export class BasicRouter implements IRouter {
 		this.linkRoute(fn, page, middleWare);
 	}
 
-	public get(url: string, page: PageProvider, checkParams: boolean = false,middleWare:MiddleWare[] = []) {
+	public get(url: string, page: PageProvider, middleWare:MiddleWare[] = [],checkParams: boolean = false) {
 		this.linkRoute(BasicRouter._method(url, checkParams, Get), page,middleWare);
 	}
 
-	public post(url: string, page: PageProvider, checkParams: boolean = false,middleWare:MiddleWare[] = []) {
+	public post(url: string, page: PageProvider, middleWare:MiddleWare[] = [],checkParams: boolean = false) {
 		this.linkRoute(BasicRouter._method(url, checkParams, Post), page,middleWare);
 	}
 
-	public put(url: string, page: PageProvider, checkParams: boolean = false,middleWare:MiddleWare[] = []) {
+	public put(url: string, page: PageProvider, middleWare:MiddleWare[] = [],checkParams: boolean = false) {
 		this.linkRoute(BasicRouter._method(url, checkParams, Put), page,middleWare);
 	}
 
-	public delete(url: string, page: PageProvider, checkParams: boolean = false,middleWare:MiddleWare[] = []) {
+	public delete(url: string, page: PageProvider, middleWare:MiddleWare[] = [],checkParams: boolean = false) {
 		this.linkRoute(BasicRouter._method(url, checkParams, Delete), page,middleWare);
 	}
 
@@ -78,9 +77,6 @@ export class BasicRouter implements IRouter {
 
 	async RouteRequest(requestEnvironment: RequestEnvironment): Promise<Page> {
 		for (let route of this.routeList) {
-			// for(var ware of value[1]){
-			// 	ware(requestEnvironment)
-			// }
 			if (route.Validate(requestEnvironment)){
 				await route.ServeRoutedMiddleware(requestEnvironment)
 				return route.pager(requestEnvironment);
