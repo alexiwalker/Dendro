@@ -127,7 +127,7 @@ export class Dendro {
 			/////////////////////////////////////
 
 			for await (const req of this.server) {
-				let env: RequestEnvironment = new RequestEnvironment(req);
+				let env: RequestEnvironment = new RequestEnvironment(req, this);
 
 				try {
 					//Serve generic pre-request middleware
@@ -139,17 +139,17 @@ export class Dendro {
 					}
 
 					//Serve Route-specific middleware
-					var routeMap = this.router.routes;
-					for (let [key, value] of routeMap) {
-						//value = [PageProvider,MiddleWare[]]
-						if (key(env.request)){
-							for(var middleware of value[1]){
-								await middleware(env)
-							}
-						}
-					}
+					// var routeMap = this.router.routes;
+					// for (let [key, value] of routeMap) {
+					// 	//value = [PageProvider,MiddleWare[]]
+					// 	if (key(env.request)){
+					// 		for(var middleware of value[1]){
+					// 			await middleware(env)
+					// 		}
+					// 	}
+					// }
 
-					req.respond(this.router.route(env).getResponse());
+					req.respond((await this.router.RouteRequest(env)).getResponse());
 
 					for (let i = 0; i < this.afterRequest.length; i++) {
 						//await: same as beforeRequest

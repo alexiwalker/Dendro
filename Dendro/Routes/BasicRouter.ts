@@ -2,10 +2,11 @@ import { ServerRequest } from "https://deno.land/std@0.50.0/http/server.ts";
 
 import { Page, Page4XX } from "../Pages/mod.ts";
 
-import { IRouter, RouteValidator, RouteMap } from "./IRouter.ts";
+import {IRouter, RouteValidator, RouteMap, RouteList} from "./IRouter.ts";
 
 import {MiddleWare, PageProvider} from "../Dendro.ts";
 import { RequestEnvironment } from "../Util/RequestEnvironment.ts";
+import {Route} from "./Route.ts";
 
 //for method-based routing
 export const Post: string = "POST";
@@ -14,12 +15,17 @@ export const Get: string = "GET";
 export const Delete: string = "DELETE";
 
 export class BasicRouter implements IRouter {
-	routes: RouteMap = new Map<RouteValidator, [PageProvider,MiddleWare[]]>();
+	// routes: RouteMap = new Map<RouteValidator, [PageProvider,MiddleWare[]]>();
+	routeList:RouteList = new Array<Route>();
 
 	constructor() {}
 
+	addRoute(route: Route): void {
+		this.routeList.push(route)
+    }
+
 	public linkRoute(validator: RouteValidator, page: PageProvider, Middleware:MiddleWare[] = []): void {
-		this.routes.set(validator, [page,Middleware]);
+		this.addRoute(new Route(validator, page,Middleware));
 	}
 
 	public url(url: string, page: PageProvider, checkParams: boolean = false, middleWare:MiddleWare[] = []): void {
@@ -70,13 +76,14 @@ export class BasicRouter implements IRouter {
 		return fn;
 	}
 
-	route(requestEnvironment: RequestEnvironment): Page {
-		for (let [key, value] of this.routes) {
+	async RouteRequest(requestEnvironment: RequestEnvironment): Promise<Page> {
+		for (let route of this.routeList) {
 			// for(var ware of value[1]){
 			// 	ware(requestEnvironment)
 			// }
-			if (key(requestEnvironment.request)){
-				return value[0](requestEnvironment);
+			if (route.Validate(requestEnvironment)){
+				await route.ServeRoutedMiddleware(requestEnvironment)
+				return route.pager(requestEnvironment);
 			}
 		}
 
