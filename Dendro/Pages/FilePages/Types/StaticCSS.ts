@@ -25,8 +25,7 @@ export class StaticCSS extends Page {
 
 	public getResponse(): Object {
 
-		// var content:string = Deno.readTextFileSync("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Assets\\styles.css");
-		var f = IO.getAssetPath(this.env.parent.getAssetPath(), this.filename)
+		let f = IO.getAssetPath(this.env.parent.getAssetPath(), this.filename);
 		let content: string = Deno.readTextFileSync(f);
 
 		this.headers.set("Content-Type", CSSMimeType)

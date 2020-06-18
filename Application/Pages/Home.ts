@@ -1,6 +1,7 @@
 import {Page} from "../../Dendro/Pages/Page.ts";
 import {RequestEnvironment} from "../../Dendro/Util/RequestEnvironment.ts";
 import {ServerRequest} from "../../Dendro/Dendro.ts";
+import {IO} from "../../Dendro/Util/IO.ts";
 
 export class HomePage extends Page {
 	_request: ServerRequest;
@@ -13,8 +14,8 @@ export class HomePage extends Page {
 	}
 
 	public getResponse(): Object {
-		let bodycontent  = Deno.readTextFileSync("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Assets\\index.html")
-
+		var f = IO.getAssetPath(this._environment.parent.getAssetPath(), "/index.html")
+		let bodycontent  = Deno.readTextFileSync(f)
 
 		return {body: bodycontent, status: 200};
 	}
