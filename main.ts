@@ -18,22 +18,21 @@ let App: Dendro = new Dendro(PORT);
 let router: BasicRouter = new BasicRouter();
 App.usesRouter(router);
 
+//setting a route from the validation tests
+App.setAssetPath("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Assets");
+router.add(contentTypeCSS, StaticCSS.new);
+router.add(contentTypeJS, StaticJS.new);
 
-//todo: works well enough but kinda ugly. Refactor to smooth this section out a bit but still use the Route object approach
-router.addRoute(new Route(Route.url("/testroute"), HomePage.new))
+//adding a route from one of the static fns that returns a validation function
+router.add(Route.url("/testroute"), HomePage.new);
 
-
-router.addRoute(new Route(Route.url("/"), HomePage.new, [
+//above, but with some added middleware
+router.add(Route.url("/"), HomePage.new, [
 	(env: RequestEnvironment) => {
 		App.log("Serving first route-specific middleware: " + env.request.url);
 	},
 	DecodeBodyJSON
-]))
-
-router.url("/test", basicGet.new)
-
-router.addRoute(new Route(contentTypeCSS, StaticCSS.new))
-router.addRoute(new Route(contentTypeJS, StaticJS.new))
+]);
 
 App.usesMiddleware((env: RequestEnvironment) => {
 	App.log("Pre Request: ")
@@ -46,7 +45,7 @@ App.usesMiddleware((env: RequestEnvironment) => {
 
 
 App.usesErrorHandler((error: Error) => {
-	App.log("Handling error...");
+	App.log("Handling error...: "+error.message);
 });
 
 App.usesLogger(new ConsoleLogger());

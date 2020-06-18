@@ -1,5 +1,5 @@
 // @ts-ignore
-import { ILogger } from "./ILogger.ts";
+import {ILogger} from "./ILogger.ts";
 
 export class ConsoleLogger implements ILogger {
 	Critical(data: string): void {
@@ -30,5 +30,6 @@ export class ConsoleLogger implements ILogger {
 		}
 	}
 
-	Warning(data: string): void {}
+	Warning(data: string): void {
+	}
 }

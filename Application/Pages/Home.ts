@@ -13,12 +13,8 @@ export class HomePage extends Page {
 	}
 
 	public getResponse(): Object {
-		let bodycontent =
-			`<head><link href="style.css"  rel="stylesheet" type="text/css"/><script src="hello.js"></script><title>Page</title></head><body class="body">
-			
+		let bodycontent  = Deno.readTextFileSync("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Assets\\index.html")
 
-
-			</body>`;
 
 		return {body: bodycontent, status: 200};
 	}
