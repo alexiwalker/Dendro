@@ -1,32 +1,34 @@
 import {Page} from "../../Page.ts";
-import {PageProvider} from "../../../Dendro.ts";
 import {RequestEnvironment} from "../../../Util/RequestEnvironment.ts";
+import {IO} from "../../../Util/IO.ts";
 
-const CSSMimeType = "application/javascript"
+const JSMimeType = "application/javascript"
 
 export class StaticJS extends Page {
 
-	private filename: String;
+	private readonly filename: string;
+	private readonly env: RequestEnvironment;
+	private readonly headers: Map<string, string>;
 
-	constructor(file: String) {
+	constructor(env: RequestEnvironment) {
 		super();
+		this.env = env;
+		this.filename = env.request.url;
+		this.headers = env.Headers;
+	}
 
-		this.filename = file;
-
+	public static new(env: RequestEnvironment) {
+		return new StaticJS(env)
 	}
 
 	public getResponse(): Object {
+		let f = IO.getAssetPath(this.env.parent.getAssetPath(), this.filename);
+		let content: string = Deno.readTextFileSync(f);
 
-		var content:string = ""
+		this.headers.set("Content-Type", JSMimeType)
 		return {
-			// headers: {
-			// 	"Content-Type":CSSMimeType
-			// },
-			body:content
+			headers: this.headers,
+			body: content
 		}
-	}
-
-	public static  new(env:RequestEnvironment) {
-		return new StaticJS(env.request.url)
 	}
 }

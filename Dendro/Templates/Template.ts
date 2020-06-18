@@ -1,10 +1,6 @@
-//I swear to god i'll get around to doing this one day.I have a lot of stuff to port over from BlueFrame lol
 
 export class Template {
-	private _baseFile: string;
-
 	public content: string = "";
-
 	conditionalPattern: RegExp = new RegExp("({{@ifs*?[([A-z]*?)]s*?(([^){]*?))s*?elses*?([^)]*?)}}");
 	includePattern: RegExp = new RegExp('({{@includes"[A-Za-z0-9.\\/]+"}})');
 	includeOncePatter: RegExp = new RegExp('({{@includeonces"[A-Za-z0-9.\\/]+"}})');
@@ -14,6 +10,7 @@ export class Template {
 	inlineCSSPattern: RegExp = new RegExp('({{@CSSs"[A-Za-z0-9.\\/]+"}})');
 	includeJSPattern: RegExp = new RegExp('({{@linkJSs"[A-Za-z0-9.\\/]+"}})');
 	includeCSSPattern: RegExp = new RegExp('({{@linkCSSs"[A-Za-z0-9.\\/]+"}})');
+	private _baseFile: string;
 
 	private constructor(baseFile: string) {
 		this._baseFile = baseFile;
@@ -24,21 +21,19 @@ export class Template {
 	 */
 	public static async CreateAsync(file: string): Promise<Template> {
 		let t = new Template(file);
-		const decoder = new TextDecoder("utf-8");
-		t.content = decoder.decode(await Deno.readFile(t._baseFile));
+
+		t.content = await Deno.readTextFile(file)
 		return t;
 	}
 
 	/**
-	 * Syncronous factory with a blocking file IO operation. Not recommended. May throw if file is not found or could not be read
+	 * Synchronous factory with a blocking file IO operation. Not recommended. May throw if file is not found or could not be read
 	 */
 	public static CreateSync(file: string): Template {
 		let t = new Template(file);
 
-		const decoder = new TextDecoder("utf-8");
-		t.content = decoder.decode(Deno.readFileSync(t._baseFile));
+		t.content = Deno.readTextFileSync(file)
 		return t;
 	}
 
-	//todo
 }

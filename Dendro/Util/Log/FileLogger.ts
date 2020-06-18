@@ -1,5 +1,5 @@
 // import { writeFileStrSync } from "https://deno.land/std@0.51.0/fs/mod.ts";
-import { ILogger } from "./ILogger.ts";
+import {ILogger} from "./ILogger.ts";
 
 //todo: implement this when deno IO stops erroring on me?
 export class FileLogger implements ILogger {
@@ -27,5 +27,6 @@ export class FileLogger implements ILogger {
 		}
 	}
 
-	Warning(data: string): void {}
+	Warning(data: string): void {
+	}
 }

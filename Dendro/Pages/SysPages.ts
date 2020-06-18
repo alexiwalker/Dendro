@@ -1,4 +1,4 @@
-import { Page } from "./mod.ts";
+import {Page} from "./mod.ts";
 
 export class Page4XX extends Page {
 	statusCode: number = 400;
@@ -12,7 +12,7 @@ export class Page4XX extends Page {
 	}
 
 	public getResponse(): Object {
-		return { body: this.statusCode.toString(), status: this.statusCode };
+		return {body: this.statusCode.toString(), status: this.statusCode};
 	}
 }
 
@@ -28,6 +28,6 @@ export class Page5XX extends Page {
 	}
 
 	public getResponse(): Object {
-		return { body: this.statusCode.toString(), status: this.statusCode };
+		return {body: this.statusCode.toString(), status: this.statusCode};
 	}
 }
