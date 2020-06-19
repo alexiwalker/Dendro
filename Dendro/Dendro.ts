@@ -24,6 +24,7 @@ export class Dendro {
 	public server: Server | null;
 	public logAllErrors: boolean;
 	public assetPath: string;
+	public templatePath:string;
 	private errorHandler: ErrorHandler | null;
 	private onErrorPager: PageProvider;
 	private beforeRequest: MiddleWare[];
@@ -43,6 +44,7 @@ export class Dendro {
 		this.beforeRequest = [];
 		this.afterRequest = [];
 		this.assetPath = "";
+		this.templatePath="";
 	}
 
 	private _logger: ILogger | null;
@@ -65,6 +67,9 @@ export class Dendro {
 
 	public setAssetPath(path: string) {
 		this.assetPath = path;
+	}
+	public setTemplatePath(path: string) {
+		this.templatePath = path;
 	}
 
 	public usesMiddleware(middleWare: MiddleWare, order: number = Dendro.MiddlewareBeforeRequest) {

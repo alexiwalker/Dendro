@@ -1,39 +1,180 @@
-
+/**
+ * Template is an engine to help with composing HTML responses, based on text files with certain patterns of text
+ *
+ * For example, {{@include "navigation.tpl"}} would replace that section with the contents of the navigation.tpl file
+ * But, if a file only needs to be included once and only once, @includeonce is used instead
+ *
+ *  {{@IJS "file.js"}} can be used to include the inline script contents of file.js. This file must be included in
+ *  Template route folder
+ *
+ *  {{@JS "file.js"}} will include a link to an separate page of file.js. This file will be served like any normal file
+ *
+ *  {{@ICSS "file.css"}} and {{@CSS "file.css"}} function the same as @IJS and @JS, but with CSS file
+ *
+ *  Keyed replacers are denoted by [[KEY]] where KEY is a key value in a Map<String,String> and is replaced by the value.
+ *  Unused keys are ignored. Replacers with no associated key are ignored. If multiple of a single replacer is used,
+ *  All of them will be replaced.
+ *  if a replacer gets replaced and contains another replacer, that one will be replaced until no more remain
+ *  if it contains its own replacer, it will likely cause a stack overflow or recursion limit error
+ */
 export class Template {
+
+	public static templatesRoot: string = "";
 	public content: string = "";
-	conditionalPattern: RegExp = new RegExp("({{@ifs*?[([A-z]*?)]s*?(([^){]*?))s*?elses*?([^)]*?)}}");
-	includePattern: RegExp = new RegExp('({{@includes"[A-Za-z0-9.\\/]+"}})');
-	includeOncePatter: RegExp = new RegExp('({{@includeonces"[A-Za-z0-9.\\/]+"}})');
+	nestedConditionalPattern: RegExp = /{{@if\s*?\[([A-z]+)]\s*?\(([^{]*?)\)\s*?else\s*?\(([^{]*?)\)\s*?}}/;
+	// conditionalPattern: RegExp = new RegExp("({{@if\\s*?[([A-z]*?)]\\s*?(([^){]*?))\\s*?else\\s*?([^)]*?)}}");
+	includePattern: RegExp = new RegExp('({{@include\\s"([A-Za-z0-9.\\/]+)"}})');
+	includeOncePattern: RegExp = new RegExp('({{@includeonce\\s"([A-Za-z0-9.\\/]+)"}})');
 	replacersPattern: RegExp = new RegExp("([[[A-Za-z0-9]+]])");
 	filenamesPattern: RegExp = new RegExp('("[A-Za-z0-9.\\/]+")');
-	inlineJSPattern: RegExp = new RegExp('({{@JSs"[A-Za-z0-9.\\/]+"}})');
-	inlineCSSPattern: RegExp = new RegExp('({{@CSSs"[A-Za-z0-9.\\/]+"}})');
-	includeJSPattern: RegExp = new RegExp('({{@linkJSs"[A-Za-z0-9.\\/]+"}})');
-	includeCSSPattern: RegExp = new RegExp('({{@linkCSSs"[A-Za-z0-9.\\/]+"}})');
+	inlineJSPattern: RegExp = new RegExp('({{@JS\\s"[A-Za-z0-9.\\/]+"}})');
+	inlineCSSPattern: RegExp = new RegExp('({{@CSS\\s"[A-Za-z0-9.\\/]+"}})');
+	includeJSPattern: RegExp = new RegExp('({{@linkJS\\s"[A-Za-z0-9.\\/]+"}})');
+	includeCSSPattern: RegExp = new RegExp('({{@linkCSS\\s"[A-Za-z0-9.\\/]+"}})');
 	private _baseFile: string;
+	private _templatePath: string;
+	public usedFiles: Array<String>;
+	public Replacers: Map<string, string | boolean>
 
-	private constructor(baseFile: string) {
-		this._baseFile = baseFile;
+	private constructor(baseFile: string, templatePath: string) {
+		this._templatePath = templatePath;
+		this._baseFile = this._templatePath + baseFile;
+		this.usedFiles = new Array<String>();
+		this.Replacers = new Map<string, string>();
 	}
 
 	/**
 	 * Async factory to allow async reading of template from the filesystem
 	 */
-	public static async CreateAsync(file: string): Promise<Template> {
-		let t = new Template(file);
+	public static async CreateAsync(file: string, templatePath: string): Promise<Template> {
+		let t = new Template(file, templatePath);
 
-		t.content = await Deno.readTextFile(file)
+		t.content = await Deno.readTextFile(t._baseFile)
 		return t;
 	}
 
 	/**
 	 * Synchronous factory with a blocking file IO operation. Not recommended. May throw if file is not found or could not be read
 	 */
-	public static CreateSync(file: string): Template {
-		let t = new Template(file);
+	public static CreateSync(file: string, templatePath: string): Template {
+		let t = new Template(file, templatePath);
 
-		t.content = Deno.readTextFileSync(file)
+		t.content = Deno.readTextFileSync(t._baseFile)
 		return t;
 	}
 
+	/**
+	 * Run all conditionals, then includes, and then replacers, updating this.content at each step
+	 */
+	public Render(): Template {
+		return this.runConditional().runIncludes().runReplacers();
+	}
+
+
+	/**
+	 * Replaces all instances of {{@include "file.tpl"}} with the contents of file.tpl
+	 * If file.tpl was already specified by an includeonce, it will still be included here
+	 */
+	public runInclude(): Template {
+		while (this.includePattern.test(this.content)) {
+			let matches = this.content.match(this.includePattern);
+			if (matches) {
+				let f = matches[2];
+				let t = Deno.readTextFileSync(this._templatePath + "/" + f);
+				this.content = this.content.replace(matches[1], t)
+			}
+		}
+		return this;
+	}
+
+	/**
+	 * Replaces the first instance of {{@includeonce "file.tpl"}} with the contents of file.tpl
+	 * All subsequent {{@includeonce "file.tpl"}} are removed
+	 * If file.tpl was already included by {{@include "file.tpl"}} but not by includeonce, it will still be included once here
+	 */
+	public runIncludeOnce(): Template {
+		while (this.includeOncePattern.test(this.content)) {
+			let matches = this.content.match(this.includeOncePattern);
+			if (matches) {
+				let f = matches[2];
+				if (this.usedFiles.includes(f))
+					this.content = this.content.replace(matches[1], "")
+				else {
+					let t = Deno.readTextFileSync(this._templatePath + "/" + f);
+					this.content = this.content.replace(matches[1], t)
+					this.usedFiles.push(f)
+				}
+			}
+		}
+		return this;
+	}
+
+	/**
+	 * Replace all {{@include}} and {{@includeonce}} directives in the template
+	 */
+	public runIncludes(): Template {
+		this.runInclude().runIncludeOnce();
+
+		return this;
+	}
+
+
+	/**
+	 * Runs any conditional statements.
+	 * Conditionals fit the form of:
+	 * {{@if [VARNAME] (conditional) else (otherwise)}}
+	 * where [VARNAME] (single square brackets) is the key that will be tested
+	 * values in (conditional) and (otherwise) are replaced verbatim and will then (if applicable) be evaluated again
+	 *
+	 * Conditional keys can be added by addReplacer, with the value being a boolean.
+	 * Eg: addReplacer("KEY", True)
+	 * If they key for a conditional is not found, or is (boolean) false, else (if it exists) will be execute.
+	 * Otherwise, the section will be hidden
+	 *
+	 */
+	public runConditional(): Template {
+		while (this.nestedConditionalPattern.test(this.content)) {
+			let matches = this.content.match(this.nestedConditionalPattern);
+			if (matches) {
+				let original = matches[0];
+				let key = matches[1]
+				let conditional = matches[2]
+				let otherwise = matches[3]
+
+
+				if(this.Replacers.has(key)){
+					var n = this.Replacers.get(key);
+					if(n as boolean && n){
+						this.content = this.content.replace(original,conditional)
+					} else {
+						this.content = this.content.replace(original,otherwise)
+					}
+				} else {
+					this.content = this.content.replace(original,otherwise)
+				}
+			}
+		}
+		return this;
+	}
+
+	/**
+	 * Replace all instances of [[KEY]] with the value set by addReplacer("KEY",value)
+	 * If key does not exist, the replacer is removed.
+	 * This process is repeated until no [[KEY]] elements remain
+	 */
+	public runReplacers(): Template {
+		return this;
+	}
+
+	/**
+	 * Add a key and value to be used in the evaluation of Conditionals and Replacers.
+	 * A conditional requires a boolean, and replacers use strings.
+	 * If a conditional key exists but uses a string, or a false boolean, the 'else' will be evaluated if it exists.
+	 * Otherwise, the section will be removed
+	 * @param key: string key that is used to identify conditionals and replacers
+	 * @param value: string | boolean that will be used in the evaluation of the condition or replacer
+	 */
+	public addReplacer(key: string, value: string | boolean) {
+		this.Replacers.set(key, value);
+	}
 }

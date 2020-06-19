@@ -10,6 +10,7 @@ import {contentTypeCSS, contentTypeJS} from "./Dendro/Pages/FilePages/ContentTyp
 import {StaticJS} from "./Dendro/Pages/FilePages/Types/StaticJS.ts";
 import {basicGet} from "./Dendro/Pages/ExamplePages.ts";
 import {Route} from "./Dendro/Routes/Route.ts";
+import {TemplateTestPage} from "./Application/Pages/TemplateTest.ts";
 
 //8000 if no env[PORT}, otherwise use env value
 let PORT: number = Env.Port(8000, "PORT")
@@ -20,33 +21,19 @@ App.usesRouter(router);
 
 //setting a route from the validation tests
 App.setAssetPath("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Assets");
+App.setTemplatePath("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Templates");
 router.add(contentTypeCSS, StaticCSS.new);
 router.add(contentTypeJS, StaticJS.new);
 
 //adding a route from one of the static fns that returns a validation function
 router.add(Route.url("/testroute"), HomePage.new);
+router.add(Route.url("/t"), TemplateTestPage.new);
 
 //above, but with some added middleware
 router.add(Route.url("/"), HomePage.new, [
-	(env: RequestEnvironment) => {
-		App.log("Serving first route-specific middleware: " + env.request.url);
-	},
 	DecodeBodyJSON
 ]);
 
-App.usesMiddleware((env: RequestEnvironment) => {
-	App.log("Pre Request: ")
-	App.logger.Info(env.request.url);
-});
-
-App.usesMiddleware((env: RequestEnvironment) => {
-	App.log("request completed");
-}, Dendro.MiddlewareAfterRequest);
-
-
-App.usesErrorHandler((error: Error) => {
-	App.log("Handling error...: "+error.message);
-});
 
 App.usesLogger(new ConsoleLogger());
 
