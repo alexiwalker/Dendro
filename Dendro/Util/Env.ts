@@ -8,4 +8,5 @@ export class Env {
 		return parseInt(String(Deno.env.get(envKey))) || Default;
 	}
 
+
 }

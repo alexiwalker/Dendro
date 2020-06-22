@@ -17,20 +17,23 @@
  *  if a replacer gets replaced and contains another replacer, that one will be replaced until no more remain
  *  if it contains its own replacer, it will likely cause a stack overflow or recursion limit error
  */
+import {Dendro} from "../Dendro.ts";
+
 export class Template {
 
 	public static templatesRoot: string = "";
 	public content: string = "";
-	nestedConditionalPattern: RegExp = /{{@if\s*?\[([A-z]+)]\s*?\(([^{]*?)\)\s*?else\s*?\(([^{]*?)\)\s*?}}/;
+	// nestedConditionalPattern: RegExp = /{{@if\s*?\[([A-z]+)]\s*?\(([^(]*?)\)\s*?else\s*?\(([\s\S]*?)\)\s*?@eif}}/;
 	// conditionalPattern: RegExp = new RegExp("({{@if\\s*?[([A-z]*?)]\\s*?(([^){]*?))\\s*?else\\s*?([^)]*?)}}");
-	includePattern: RegExp = new RegExp('({{@include\\s"([A-Za-z0-9.\\/]+)"}})');
-	includeOncePattern: RegExp = new RegExp('({{@includeonce\\s"([A-Za-z0-9.\\/]+)"}})');
-	replacersPattern: RegExp = new RegExp("([[[A-Za-z0-9]+]])");
-	filenamesPattern: RegExp = new RegExp('("[A-Za-z0-9.\\/]+")');
-	inlineJSPattern: RegExp = new RegExp('({{@JS\\s"[A-Za-z0-9.\\/]+"}})');
-	inlineCSSPattern: RegExp = new RegExp('({{@CSS\\s"[A-Za-z0-9.\\/]+"}})');
-	includeJSPattern: RegExp = new RegExp('({{@linkJS\\s"[A-Za-z0-9.\\/]+"}})');
-	includeCSSPattern: RegExp = new RegExp('({{@linkCSS\\s"[A-Za-z0-9.\\/]+"}})');
+	includePattern: RegExp = /{{@include\s"([A-Za-z0-9.\\\/]+)"}}/;
+	includeOncePattern: RegExp = /{{@includeonce\s"([A-Za-z0-9.\\\/]+)"}}/;
+	// replacersPattern: RegExp =    /\[\[([A-Za-z0-9]+)]]/g;
+	replacersPattern: RegExp = /\[\[([a-zA-Z]*?)]]/g;
+	filenamesPattern: RegExp = /("[A-Za-z0-9.\\/]+")/g;
+	inlineJSPattern: RegExp = /({{@JS\\s"[A-Za-z0-9.\\/]+"}})/g;
+	inlineCSSPattern: RegExp = /({{@CSS\\s"[A-Za-z0-9.\\/]+"}})/g;
+	includeJSPattern: RegExp = /({{@linkJS\\s"[A-Za-z0-9.\\/]+"}})/g;
+	includeCSSPattern: RegExp = /({{@linkCSS\\s"[A-Za-z0-9.\\/]+"}})/g;
 	private _baseFile: string;
 	private _templatePath: string;
 	public usedFiles: Array<String>;
@@ -67,7 +70,8 @@ export class Template {
 	 * Run all conditionals, then includes, and then replacers, updating this.content at each step
 	 */
 	public Render(): Template {
-		return this.runConditional().runIncludes().runReplacers();
+		// return this.runConditional().runIncludes().runReplacers();
+		return this.runIncludes().runReplacers();
 	}
 
 
@@ -76,12 +80,19 @@ export class Template {
 	 * If file.tpl was already specified by an includeonce, it will still be included here
 	 */
 	public runInclude(): Template {
+
 		while (this.includePattern.test(this.content)) {
-			let matches = this.content.match(this.includePattern);
-			if (matches) {
-				let f = matches[2];
-				let t = Deno.readTextFileSync(this._templatePath + "/" + f);
-				this.content = this.content.replace(matches[1], t)
+			try {
+				let matches = this.content.match(this.includePattern);
+				if (matches) {
+					let f = matches[1];
+					f = this._templatePath + "/" + f
+					let t = Deno.readTextFileSync(f);
+					this.content = this.content.replace(matches[0], t)
+				}
+			} catch (e) {
+				e = e as Error
+				Dendro.logger.Debug(e.message)
 			}
 		}
 		return this;
@@ -93,17 +104,30 @@ export class Template {
 	 * If file.tpl was already included by {{@include "file.tpl"}} but not by includeonce, it will still be included once here
 	 */
 	public runIncludeOnce(): Template {
+
+
 		while (this.includeOncePattern.test(this.content)) {
-			let matches = this.content.match(this.includeOncePattern);
-			if (matches) {
-				let f = matches[2];
-				if (this.usedFiles.includes(f))
-					this.content = this.content.replace(matches[1], "")
-				else {
-					let t = Deno.readTextFileSync(this._templatePath + "/" + f);
-					this.content = this.content.replace(matches[1], t)
-					this.usedFiles.push(f)
+			try {
+				let matches = this.content.match(this.includeOncePattern);
+				if (matches) {
+					let f = matches[1];
+
+					if (this.usedFiles.includes(f)) {
+						this.content = this.content.replace(matches[0], "")
+						continue;
+					} else {
+						this.usedFiles.push(f);
+
+					}
+
+					f = this._templatePath + "/" + f
+
+					let t = Deno.readTextFileSync(f);
+					this.content = this.content.replace(matches[0], t)
 				}
+			} catch (e) {
+				e = e as Error
+				Dendro.logger.Debug(e.message)
 			}
 		}
 		return this;
@@ -132,30 +156,30 @@ export class Template {
 	 * Otherwise, the section will be hidden
 	 *
 	 */
-	public runConditional(): Template {
-		while (this.nestedConditionalPattern.test(this.content)) {
-			let matches = this.content.match(this.nestedConditionalPattern);
-			if (matches) {
-				let original = matches[0];
-				let key = matches[1]
-				let conditional = matches[2]
-				let otherwise = matches[3]
-
-
-				if(this.Replacers.has(key)){
-					var n = this.Replacers.get(key);
-					if(n as boolean && n){
-						this.content = this.content.replace(original,conditional)
-					} else {
-						this.content = this.content.replace(original,otherwise)
-					}
-				} else {
-					this.content = this.content.replace(original,otherwise)
-				}
-			}
-		}
-		return this;
-	}
+	// public runConditional(): Template {
+	// 	while (this.nestedConditionalPattern.test(this.content)) {
+	// 		let matches = this.content.match(this.nestedConditionalPattern);
+	// 		if (matches) {
+	// 			let original = matches[0];
+	// 			let key = matches[1]
+	// 			let conditional = matches[2]
+	// 			let otherwise = matches[3]
+	//
+	//
+	// 			if(this.Replacers.has(key)){
+	// 				let n = this.Replacers.get(key);
+	// 				if(n as boolean && n){
+	// 					this.content = this.content.replace(original,conditional)
+	// 				} else {
+	// 					this.content = this.content.replace(original,otherwise)
+	// 				}
+	// 			} else {
+	// 				this.content = this.content.replace(original,otherwise)
+	// 			}
+	// 		}
+	// 	}
+	// 	return this;
+	// }
 
 	/**
 	 * Replace all instances of [[KEY]] with the value set by addReplacer("KEY",value)
@@ -163,6 +187,25 @@ export class Template {
 	 * This process is repeated until no [[KEY]] elements remain
 	 */
 	public runReplacers(): Template {
+
+		while (this.replacersPattern.test(this.content)) {
+			let matches = this.content.match(this.replacersPattern);
+
+			if (matches) {
+
+				let val: string = matches[0].replace("[[", "").replace("]]", "");
+				if (this.Replacers.has(val)) {
+					val = this.Replacers.get(matches[0].replace("[[", "").replace("]]", "")) as string
+				} else {
+					val = "";
+				}
+
+				this.content = this.content.replace(matches[0], val)
+
+			}
+
+		}
+
 		return this;
 	}
 

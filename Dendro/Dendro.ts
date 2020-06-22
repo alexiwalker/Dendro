@@ -2,7 +2,7 @@ import {serve, Server} from "https://deno.land/std@0.50.0/http/server.ts";
 
 import {BasicRouter, IRouter} from "./Routes/mod.ts";
 
-import {ILogger} from "./Util/mod.ts";
+import {ConsoleLogger, ILogger} from "./Util/mod.ts";
 
 import {Page, Page5XX} from "./Pages/mod.ts";
 import {RequestEnvironment} from "./Util/RequestEnvironment.ts";
@@ -29,6 +29,7 @@ export class Dendro {
 	private onErrorPager: PageProvider;
 	private beforeRequest: MiddleWare[];
 	private afterRequest: MiddleWare[];
+	public static logger:ILogger = new ConsoleLogger();
 
 	constructor(port: number) {
 		this.port = port;
@@ -86,7 +87,7 @@ export class Dendro {
 	public async Serve() {
 		this.server = serve({port: this.port});
 		if (this.server) {
-			console.log("Serving on localhost:" + this.port.toString());
+			Dendro.logger.Info("Serving on http://localhost:" + this.port.toString());
 
 			/////////////////////////////////////
 
@@ -118,6 +119,7 @@ export class Dendro {
 
 	public usesLogger(logger: ILogger) {
 		this._logger = logger;
+		Dendro.logger = logger;
 	}
 
 	public usesErrorHandler(errorhandler: ErrorHandler) {

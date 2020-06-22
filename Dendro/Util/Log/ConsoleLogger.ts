@@ -1,5 +1,6 @@
 // @ts-ignore
 import {ILogger} from "./ILogger.ts";
+import {Env} from "../Env.ts";
 
 export class ConsoleLogger implements ILogger {
 	Critical(data: string): void {
@@ -31,5 +32,12 @@ export class ConsoleLogger implements ILogger {
 	}
 
 	Warning(data: string): void {
+		console.log("Warning: " + data);
+	}
+
+	Debug(data: string): void {
+		console.log(Env.Numeric("DEBUG"));
+		if(Env.Numeric("DEBUG",0)>0)
+			console.log("Debug: " + data);
 	}
 }

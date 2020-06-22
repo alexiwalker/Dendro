@@ -12,4 +12,6 @@ export interface ILogger {
 	Error(data: string): void;
 
 	Critical(data: string): void;
+
+	Debug(data:string):void;
 }
