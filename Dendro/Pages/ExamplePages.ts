@@ -2,6 +2,10 @@ import {Page} from "./Page.ts";
 import {ServerRequest} from "https://deno.land/std@0.50.0/http/server.ts";
 import {RequestEnvironment} from "../Util/RequestEnvironment.ts";
 
+/**
+ * This is an example Page that returns a 200 status, along with the request method and url used.
+ * Primarily used for testing, and as an example of page structure
+ */
 export class HomePage extends Page {
 	_request: ServerRequest;
 	_environment: RequestEnvironment;
@@ -23,6 +27,10 @@ export class HomePage extends Page {
 	}
 }
 
+/**
+ * Another page used for testing or example. Intended for when the request to the routed URL used Get
+ * Primarily used for testing Route validation functions
+ */
 export class basicGet extends Page {
 	_request: ServerRequest;
 	_environment: RequestEnvironment;
@@ -44,6 +52,11 @@ export class basicGet extends Page {
 	}
 }
 
+
+/**
+ * Another page used for testing or example. Intended for when the request to the routed URL used Put
+ * Primarily used for testing Route validation functions
+ */
 export class basicPut extends Page {
 	_request: ServerRequest;
 	_environment: RequestEnvironment;
@@ -65,6 +78,11 @@ export class basicPut extends Page {
 	}
 }
 
+
+/**
+ * Another page used for testing or example. Intended for when the request to the routed URL used Post
+ * Primarily used for testing Route validation functions
+ */
 export class basicPost extends Page {
 	_request: ServerRequest;
 	_environment: RequestEnvironment;
@@ -86,6 +104,11 @@ export class basicPost extends Page {
 	}
 }
 
+
+/**
+ * Another page used for testing or example. Intended for when the request to the routed URL used Delete
+ * Primarily used for testing Route validation functions
+ */
 export class basicDelete extends Page {
 	_request: ServerRequest;
 	_environment: RequestEnvironment;

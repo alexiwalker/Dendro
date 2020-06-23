@@ -19,17 +19,17 @@ export declare type MiddleWare = (environment: RequestEnvironment) => void;
 export class Dendro {
 	public static MiddlewareBeforeRequest: number = 0;
 	public static MiddlewareAfterRequest: number = 1;
+	public static logger: ILogger = new ConsoleLogger();
 	public port: number;
 	public router: IRouter;
 	public server: Server | null;
 	public logAllErrors: boolean;
 	public assetPath: string;
-	public templatePath:string;
+	public templatePath: string;
 	private errorHandler: ErrorHandler | null;
 	private onErrorPager: PageProvider;
 	private beforeRequest: MiddleWare[];
 	private afterRequest: MiddleWare[];
-	public static logger:ILogger = new ConsoleLogger();
 
 	constructor(port: number) {
 		this.port = port;
@@ -45,7 +45,7 @@ export class Dendro {
 		this.beforeRequest = [];
 		this.afterRequest = [];
 		this.assetPath = "";
-		this.templatePath="";
+		this.templatePath = "";
 	}
 
 	private _logger: ILogger | null;
@@ -69,6 +69,7 @@ export class Dendro {
 	public setAssetPath(path: string) {
 		this.assetPath = path;
 	}
+
 	public setTemplatePath(path: string) {
 		this.templatePath = path;
 	}
@@ -143,7 +144,7 @@ export class Dendro {
 
 		if (this.errorHandler != null) this.errorHandler(error);
 		else {
-			throw Error;
+			throw error;
 		}
 	}
 }

@@ -28,16 +28,18 @@ export class Template {
 	includePattern: RegExp = /{{@include\s"([A-Za-z0-9.\\\/]+)"}}/;
 	includeOncePattern: RegExp = /{{@includeonce\s"([A-Za-z0-9.\\\/]+)"}}/;
 	// replacersPattern: RegExp =    /\[\[([A-Za-z0-9]+)]]/g;
+	iterablePartAPattern: RegExp = new RegExp('{{@iter\s*? ([^}]*?)}}');
+
 	replacersPattern: RegExp = /\[\[([a-zA-Z]*?)]]/g;
 	filenamesPattern: RegExp = /("[A-Za-z0-9.\\/]+")/g;
 	inlineJSPattern: RegExp = /({{@JS\\s"[A-Za-z0-9.\\/]+"}})/g;
 	inlineCSSPattern: RegExp = /({{@CSS\\s"[A-Za-z0-9.\\/]+"}})/g;
 	includeJSPattern: RegExp = /({{@linkJS\\s"[A-Za-z0-9.\\/]+"}})/g;
 	includeCSSPattern: RegExp = /({{@linkCSS\\s"[A-Za-z0-9.\\/]+"}})/g;
-	private _baseFile: string;
-	private _templatePath: string;
 	public usedFiles: Array<String>;
 	public Replacers: Map<string, string | boolean>
+	private _baseFile: string;
+	private _templatePath: string;
 
 	private constructor(baseFile: string, templatePath: string) {
 		this._templatePath = templatePath;
@@ -68,9 +70,9 @@ export class Template {
 
 	/**
 	 * Run all conditionals, then includes, and then replacers, updating this.content at each step
+	 * All the individual "RunThing()" functions are public, so they can be execute in any order you want, if needed.
 	 */
 	public Render(): Template {
-		// return this.runConditional().runIncludes().runReplacers();
 		return this.runIncludes().runReplacers();
 	}
 
@@ -144,6 +146,8 @@ export class Template {
 
 
 	/**
+	 *
+	 * WARNING This is still.... buggy, and im current looking at a better way to implement it because Regex seems insufficient
 	 * Runs any conditional statements.
 	 * Conditionals fit the form of:
 	 * {{@if [VARNAME] (conditional) else (otherwise)}}
@@ -154,6 +158,7 @@ export class Template {
 	 * Eg: addReplacer("KEY", True)
 	 * If they key for a conditional is not found, or is (boolean) false, else (if it exists) will be execute.
 	 * Otherwise, the section will be hidden
+	 *
 	 *
 	 */
 	// public runConditional(): Template {
@@ -220,4 +225,5 @@ export class Template {
 	public addReplacer(key: string, value: string | boolean) {
 		this.Replacers.set(key, value);
 	}
+
 }

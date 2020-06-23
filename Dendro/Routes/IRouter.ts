@@ -11,10 +11,11 @@ export declare type Router = IRouter;
 //This occurs after the pre-request middleware, so any changes made to the environment or request
 //in the pre-request middleware stage can affect the page returned (eg, changes made to request methods or urls)
 export interface IRouter {
-
-	//Page returned based on the contents of the RequestEnvironment and/or the Request object within.
-	//impl as async
-
+	/**
+	 * Takes a RequestEnvironment object and returns an object inheriting from Page
+	 * @param requestEnvironment
+	 * @constructor
+	 */
 	RouteRequest(requestEnvironment: RequestEnvironment): Promise<Page>;
 }
 

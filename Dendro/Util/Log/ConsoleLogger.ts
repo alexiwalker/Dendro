@@ -36,8 +36,7 @@ export class ConsoleLogger implements ILogger {
 	}
 
 	Debug(data: string): void {
-		console.log(Env.Numeric("DEBUG"));
-		if(Env.Numeric("DEBUG",0)>0)
+		if (Env.Numeric("DEBUG", 0) > 0)
 			console.log("Debug: " + data);
 	}
 }
