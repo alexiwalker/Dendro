@@ -8,10 +8,8 @@ import {MiddleWare, PageProvider} from "../Dendro.ts";
 import {RequestEnvironment} from "../Util/RequestEnvironment.ts";
 import {Route} from "./Route.ts";
 import {contentTypeAny, contentTypeCSS, contentTypeImage, contentTypeJS} from "../Pages/FilePages/ContentTypes.ts";
-import {StaticCSS} from "../Pages/FilePages/Types/StaticCSS.ts";
-import {StaticJS} from "../Pages/FilePages/Types/StaticJS.ts";
-import {StaticImage} from "../Pages/FilePages/Types/StaticImage.ts";
-import {StaticAny} from "../Pages/FilePages/Types/ServeAny.ts";
+
+import {ServeAny} from "../Pages/FilePages/Types/ServeAny.ts";
 
 //for method-based routing
 export const Post: string = "POST";
@@ -168,10 +166,10 @@ export class BasicRouter implements IRouter {
 	 * A file with an extension that is not listed will be served with no content-type headers as a uint8 array and its original file name
 	 */
 	public addStaticDefaults():BasicRouter {
-		this.add(contentTypeCSS, StaticCSS.new);
-		this.add(contentTypeJS, StaticJS.new);
-		this.add(contentTypeImage, StaticImage.new)
-		this.add(contentTypeAny, StaticAny.new)
+		this.add(contentTypeCSS, ServeAny.new);
+		this.add(contentTypeJS, ServeAny.new);
+		this.add(contentTypeImage, ServeAny.new)
+		this.add(contentTypeAny, ServeAny.new)
 		return this;
 	}
 }

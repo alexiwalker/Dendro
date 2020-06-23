@@ -19,6 +19,10 @@ export class Page4XX extends Page {
 	public getResponse(): Object {
 		return {body: this.statusCode.toString(), status: this.statusCode};
 	}
+
+	public static new(status:number):Page4XX{
+		return new Page4XX(status)
+	}
 }
 
 /**
@@ -40,5 +44,10 @@ export class Page5XX extends Page {
 
 	public getResponse(): Object {
 		return {body: this.statusCode.toString(), status: this.statusCode};
+	}
+
+
+	public static new(status:number):Page5XX{
+		return new Page5XX(status)
 	}
 }

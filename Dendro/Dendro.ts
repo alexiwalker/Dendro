@@ -4,7 +4,7 @@ import {BasicRouter, IRouter} from "./Routes/mod.ts";
 
 import {ConsoleLogger, ILogger} from "./Util/mod.ts";
 
-import {Page, Page5XX} from "./Pages/mod.ts";
+import {Page, Page4XX, Page5XX} from "./Pages/mod.ts";
 import {RequestEnvironment} from "./Util/RequestEnvironment.ts";
 
 //As all RouteValidators and RoutePagers require ServerRequest, it is also exported here even if it is imported via other files
@@ -14,6 +14,7 @@ export {ServerRequest} from "https://deno.land/std@0.50.0/http/server.ts";
 
 export declare type ErrorHandler = (error: Error) => void;
 export declare type PageProvider = (environment: RequestEnvironment) => Page;
+export declare type StatusPageProvider = (status: number) => Page;
 export declare type MiddleWare = (environment: RequestEnvironment) => void;
 
 export class Dendro {
@@ -24,12 +25,16 @@ export class Dendro {
 	public router: IRouter;
 	public server: Server | null;
 	public logAllErrors: boolean;
-	public assetPath: string;
-	public templatePath: string;
+	public static assetPath: string= ""
+	public static templatePath: string= ""
 	private errorHandler: ErrorHandler | null;
 	private onErrorPager: PageProvider;
 	private beforeRequest: MiddleWare[];
 	private afterRequest: MiddleWare[];
+
+	public static Page400:StatusPageProvider = Page4XX.new;
+	public static Page500:StatusPageProvider = Page5XX.new;
+
 
 	constructor(port: number) {
 		this.port = port;
@@ -39,13 +44,12 @@ export class Dendro {
 		this.errorHandler = null;
 		this.logAllErrors = false;
 		this.onErrorPager = (env: RequestEnvironment) => {
-			return new Page5XX(500);
+			return Dendro.Page500(500);
 		};
 
 		this.beforeRequest = [];
 		this.afterRequest = [];
-		this.assetPath = "";
-		this.templatePath = "";
+
 	}
 
 	private _logger: ILogger | null;
@@ -62,16 +66,28 @@ export class Dendro {
 		return this.afterRequest;
 	}
 
-	public getAssetPath(): string {
-		return this.assetPath;
+	public static getAssetPath(): string {
+		return Dendro.assetPath;
 	}
 
-	public setAssetPath(path: string) {
-		this.assetPath = path;
+	public getAssetPath(){
+		return Dendro.getAssetPath()
 	}
 
-	public setTemplatePath(path: string) {
-		this.templatePath = path;
+	public static setAssetPath(path: string) {
+		Dendro.assetPath = path;
+	}
+
+	public static setTemplatePath(path: string) {
+		Dendro.templatePath = path;
+	}
+
+	public static getTemplatePath(){
+		return Dendro.templatePath;
+	}
+
+	public getTemplatePath(){
+		return Dendro.templatePath;
 	}
 
 	public usesMiddleware(middleWare: MiddleWare, order: number = Dendro.MiddlewareBeforeRequest) {

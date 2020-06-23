@@ -3,7 +3,7 @@ import {ConsoleLogger} from "./Dendro/Util/Log/ConsoleLogger.ts";
 import {BasicRouter} from "./Dendro/Routes/mod.ts";
 import {DecodeBodyJSON} from "./Dendro/Middleware/Middleware.ts";
 import {Env} from "./Dendro/Util/Env.ts";
-import {HomePage} from "./Application/Pages/Home.ts";
+import {HomePage, TemplatedHomePage} from "./Application/Pages/Home.ts";
 
 import {Route} from "./Dendro/Routes/Route.ts";
 
@@ -16,8 +16,8 @@ let router: BasicRouter = new BasicRouter();
 App.usesRouter(router);
 
 //setting a route from the validation tests
-App.setAssetPath("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Assets\\");
-App.setTemplatePath("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Templates");
+Dendro.setAssetPath("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Assets\\");
+Dendro.setTemplatePath("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Templates");
 
 router.addStaticDefaults()
 
@@ -29,6 +29,7 @@ router.add(Route.url("/"), HomePage.new, [()=>{
 	DecodeBodyJSON
 ]);
 
+router.url("/template",TemplatedHomePage.new )
 
 App.usesErrorHandler((e:Error)=>{
 	App.logger.Error(e.message)
