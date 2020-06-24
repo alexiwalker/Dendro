@@ -2,9 +2,9 @@ import {serve, Server} from "https://deno.land/std@0.50.0/http/server.ts";
 
 import {BasicRouter, IRouter} from "./Routes/mod.ts";
 
-import {ILogger} from "./Util/mod.ts";
+import {ConsoleLogger, ILogger} from "./Util/mod.ts";
 
-import {Page, Page5XX} from "./Pages/mod.ts";
+import {Page, Page4XX, Page5XX} from "./Pages/mod.ts";
 import {RequestEnvironment} from "./Util/RequestEnvironment.ts";
 
 //As all RouteValidators and RoutePagers require ServerRequest, it is also exported here even if it is imported via other files
@@ -14,16 +14,21 @@ export {ServerRequest} from "https://deno.land/std@0.50.0/http/server.ts";
 
 export declare type ErrorHandler = (error: Error) => void;
 export declare type PageProvider = (environment: RequestEnvironment) => Page;
+export declare type StatusPageProvider = (status: number) => Page;
 export declare type MiddleWare = (environment: RequestEnvironment) => void;
 
 export class Dendro {
 	public static MiddlewareBeforeRequest: number = 0;
 	public static MiddlewareAfterRequest: number = 1;
+	public static logger: ILogger = new ConsoleLogger();
+	public static assetPath: string = ""
+	public static templatePath: string = ""
+	public static Page400: StatusPageProvider = Page4XX.new;
+	public static Page500: StatusPageProvider = Page5XX.new;
 	public port: number;
 	public router: IRouter;
 	public server: Server | null;
 	public logAllErrors: boolean;
-	public assetPath: string;
 	private errorHandler: ErrorHandler | null;
 	private onErrorPager: PageProvider;
 	private beforeRequest: MiddleWare[];
@@ -36,13 +41,13 @@ export class Dendro {
 		this._logger = null;
 		this.errorHandler = null;
 		this.logAllErrors = false;
-		this.onErrorPager = (env: RequestEnvironment) => {
-			return new Page5XX(500);
+		this.onErrorPager = () => {
+			return Dendro.Page500(500);
 		};
 
 		this.beforeRequest = [];
 		this.afterRequest = [];
-		this.assetPath = "";
+
 	}
 
 	private _logger: ILogger | null;
@@ -59,12 +64,28 @@ export class Dendro {
 		return this.afterRequest;
 	}
 
-	public getAssetPath(): string {
-		return this.assetPath;
+	public static getAssetPath(): string {
+		return Dendro.assetPath;
 	}
 
-	public setAssetPath(path: string) {
-		this.assetPath = path;
+	public static setAssetPath(path: string) {
+		Dendro.assetPath = path;
+	}
+
+	public static setTemplatePath(path: string) {
+		Dendro.templatePath = path;
+	}
+
+	public static getTemplatePath() {
+		return Dendro.templatePath;
+	}
+
+	public getAssetPath() {
+		return Dendro.getAssetPath()
+	}
+
+	public getTemplatePath() {
+		return Dendro.templatePath;
 	}
 
 	public usesMiddleware(middleWare: MiddleWare, order: number = Dendro.MiddlewareBeforeRequest) {
@@ -81,7 +102,7 @@ export class Dendro {
 	public async Serve() {
 		this.server = serve({port: this.port});
 		if (this.server) {
-			console.log("Serving on localhost:" + this.port.toString());
+			Dendro.logger.Info("Serving on http://localhost:" + this.port.toString());
 
 			/////////////////////////////////////
 
@@ -113,6 +134,7 @@ export class Dendro {
 
 	public usesLogger(logger: ILogger) {
 		this._logger = logger;
+		Dendro.logger = logger;
 	}
 
 	public usesErrorHandler(errorhandler: ErrorHandler) {
@@ -136,7 +158,7 @@ export class Dendro {
 
 		if (this.errorHandler != null) this.errorHandler(error);
 		else {
-			throw Error;
+			throw error;
 		}
 	}
 }

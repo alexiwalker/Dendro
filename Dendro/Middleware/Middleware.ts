@@ -1,4 +1,4 @@
-import {MiddleWare, ServerRequest} from "../Dendro.ts";
+import {Dendro, MiddleWare, ServerRequest} from "../Dendro.ts";
 import {RequestEnvironment} from "../Util/RequestEnvironment.ts";
 import {Post} from "../Routes/BasicRouter.ts";
 
@@ -11,8 +11,7 @@ export var DecodeBodyJSON: MiddleWare = async function (env: RequestEnvironment)
 	try {
 		let req: ServerRequest = env.request;
 		let len = req.contentLength as number;
-		const buf = new Uint8Array(len);
-		let bufSlice = buf;
+		let bufSlice = new Uint8Array(len);
 		let totRead = 0;
 		while (true) {
 			const nread = await req.body.read(bufSlice);
@@ -26,8 +25,8 @@ export var DecodeBodyJSON: MiddleWare = async function (env: RequestEnvironment)
 
 		let obj = JSON.parse(bodyString);
 
-		for (var key in obj) {
-			console.log(key + " " + obj[key]);
+		for (let key in obj) {
+			Dendro.logger.Debug(key + " " + obj[key]);
 		}
 
 		env.environmentVars.set("body", obj);
