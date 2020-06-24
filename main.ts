@@ -15,23 +15,23 @@ let App: Dendro = new Dendro(PORT);
 let router: BasicRouter = new BasicRouter();
 App.usesRouter(router);
 
-//setting a route from the validation tests
-Dendro.setAssetPath("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Assets\\");
-Dendro.setTemplatePath("C:\\Users\\alex\\Projects\\WebStormProjects\\Atrius\\Application\\Templates");
+Dendro.setAssetPath(Deno.env.get("ASSETS") as string);
+Dendro.setTemplatePath(Deno.env.get("TEMPLATES") as string);
 
 router.addStaticDefaults()
 
-
-//above, but with some added middleware
-router.add(Route.url("/"), HomePage.new, [()=>{
-
-},
+router.add(Route.url("/"), HomePage.new, [
+	//An example of inline declared middledware
+	() => {
+		Dendro.logger.Info("Home Page accessed")
+	},
+	//An example of a pre-existing function included as middleware
 	DecodeBodyJSON
 ]);
 
-router.url("/template",TemplatedHomePage.new )
+router.url("/template", TemplatedHomePage.new)
 
-App.usesErrorHandler((e:Error)=>{
+App.usesErrorHandler((e: Error) => {
 	App.logger.Error(e.message)
 })
 

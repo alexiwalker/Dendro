@@ -38,8 +38,6 @@ export class TemplatedHomePage extends Page {
 
 	public getResponse(): Object {
 		let bodycontent = Template.CreateSync("/tplHome.tpl").Render({variableA:"ABCDEFG"})
-		console.log(bodycontent)
-
 		return {body: bodycontent, status: 200};
 	}
 
