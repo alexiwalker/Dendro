@@ -21,20 +21,18 @@ export class Dendro {
 	public static MiddlewareBeforeRequest: number = 0;
 	public static MiddlewareAfterRequest: number = 1;
 	public static logger: ILogger = new ConsoleLogger();
+	public static assetPath: string = ""
+	public static templatePath: string = ""
+	public static Page400: StatusPageProvider = Page4XX.new;
+	public static Page500: StatusPageProvider = Page5XX.new;
 	public port: number;
 	public router: IRouter;
 	public server: Server | null;
 	public logAllErrors: boolean;
-	public static assetPath: string= ""
-	public static templatePath: string= ""
 	private errorHandler: ErrorHandler | null;
 	private onErrorPager: PageProvider;
 	private beforeRequest: MiddleWare[];
 	private afterRequest: MiddleWare[];
-
-	public static Page400:StatusPageProvider = Page4XX.new;
-	public static Page500:StatusPageProvider = Page5XX.new;
-
 
 	constructor(port: number) {
 		this.port = port;
@@ -43,7 +41,7 @@ export class Dendro {
 		this._logger = null;
 		this.errorHandler = null;
 		this.logAllErrors = false;
-		this.onErrorPager = (env: RequestEnvironment) => {
+		this.onErrorPager = () => {
 			return Dendro.Page500(500);
 		};
 
@@ -70,10 +68,6 @@ export class Dendro {
 		return Dendro.assetPath;
 	}
 
-	public getAssetPath(){
-		return Dendro.getAssetPath()
-	}
-
 	public static setAssetPath(path: string) {
 		Dendro.assetPath = path;
 	}
@@ -82,11 +76,15 @@ export class Dendro {
 		Dendro.templatePath = path;
 	}
 
-	public static getTemplatePath(){
+	public static getTemplatePath() {
 		return Dendro.templatePath;
 	}
 
-	public getTemplatePath(){
+	public getAssetPath() {
+		return Dendro.getAssetPath()
+	}
+
+	public getTemplatePath() {
 		return Dendro.templatePath;
 	}
 

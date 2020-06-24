@@ -7,7 +7,7 @@ import {IRouter, RouteList, RouteValidator} from "./IRouter.ts";
 import {MiddleWare, PageProvider} from "../Dendro.ts";
 import {RequestEnvironment} from "../Util/RequestEnvironment.ts";
 import {Route} from "./Route.ts";
-import {contentTypeAny, contentTypeCSS, contentTypeImage, contentTypeJS} from "../Pages/FilePages/ContentTypes.ts";
+import {contentTypeAny, contentTypeCSS, contentTypeJS, contentTypeStatic} from "../Pages/FilePages/ContentTypes.ts";
 
 import {ServeAny} from "../Pages/FilePages/Types/ServeAny.ts";
 
@@ -165,10 +165,10 @@ export class BasicRouter implements IRouter {
 	 * Adds default static file handling for requests where the URL ends with .css, .js, or standard image types.
 	 * A file with an extension that is not listed will be served with no content-type headers as a uint8 array and its original file name
 	 */
-	public addStaticDefaults():BasicRouter {
+	public addStaticDefaults(): BasicRouter {
 		this.add(contentTypeCSS, ServeAny.new);
 		this.add(contentTypeJS, ServeAny.new);
-		this.add(contentTypeImage, ServeAny.new)
+		this.add(contentTypeStatic, ServeAny.new)
 		this.add(contentTypeAny, ServeAny.new)
 		return this;
 	}

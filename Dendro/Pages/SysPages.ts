@@ -16,12 +16,12 @@ export class Page4XX extends Page {
 		this.statusCode = status;
 	}
 
-	public getResponse(): Object {
-		return {body: this.statusCode.toString(), status: this.statusCode};
+	public static new(status: number): Page4XX {
+		return new Page4XX(status)
 	}
 
-	public static new(status:number):Page4XX{
-		return new Page4XX(status)
+	public getResponse(): Object {
+		return {body: this.statusCode.toString(), status: this.statusCode};
 	}
 }
 
@@ -42,12 +42,11 @@ export class Page5XX extends Page {
 		this.statusCode = status;
 	}
 
-	public getResponse(): Object {
-		return {body: this.statusCode.toString(), status: this.statusCode};
+	public static new(status: number): Page5XX {
+		return new Page5XX(status)
 	}
 
-
-	public static new(status:number):Page5XX{
-		return new Page5XX(status)
+	public getResponse(): Object {
+		return {body: this.statusCode.toString(), status: this.statusCode};
 	}
 }

@@ -13,8 +13,8 @@ export var MimeTypes: Map<string, string> = new Map<string, string>([
 	[".pjp", "image/jpeg"],
 	[".gif", "image/gif"],
 	[".svg", "image/svg+xml"],
-	[".js","application/javascript"],
-	[".css","text/css"],
+	[".js", "application/javascript"],
+	[".css", "text/css"],
 ])
 
 
@@ -38,19 +38,17 @@ export class ServeAny extends Page {
 
 	public getResponse(): Object {
 		let f = IO.getAssetPath(this.env.parent.getAssetPath(), this.filename);
-		var fileType = `.${this.filename.split(".").reverse()[0]}`
-		console.log(fileType);
-		if(MimeTypes.has(fileType)){
-			this.headers.set("Content-Type",MimeTypes.get(fileType) as string )
+		let fileType = `.${this.filename.split(".").reverse()[0]}`
+		if (MimeTypes.has(fileType)) {
+			this.headers.set("Content-Type", MimeTypes.get(fileType) as string)
 		}
-		console.log(this.headers);
 		try {
 			let content = Deno.readFileSync(f);
 			return {
 				body: content,
-				headers:this.headers
+				headers: this.headers
 			}
-		} catch (error){
+		} catch (error) {
 			Dendro.logger.Warning(`404 on static file: ${f}`)
 			return Dendro.Page400(404);
 		}
