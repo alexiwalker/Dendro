@@ -1,17 +1,15 @@
 export declare type Logger = ILogger;
 
 export interface ILogger {
-	Log(data: string): void;
+	Log(data: any): void;
 
-	Log(data: Error): void;
+	Info(data: any): void;
 
-	Info(data: string): void;
+	Warning(data: any): void;
 
-	Warning(data: string): void;
+	Error(data: any): void;
 
-	Error(data: string): void;
+	Critical(data: any): void;
 
-	Critical(data: string): void;
-
-	Debug(data: string): void;
+	Debug(data: any): void;
 }

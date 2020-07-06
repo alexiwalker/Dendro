@@ -12,7 +12,7 @@ import {RequestEnvironment} from "./Util/RequestEnvironment.ts";
 // @ts-ignore
 export {ServerRequest} from "https://deno.land/std@0.50.0/http/server.ts";
 
-export declare type ErrorHandler = (error: Error) => void;
+export declare type ErrorHandler = (error: Error, env: RequestEnvironment) => void;
 export declare type PageProvider = (environment: RequestEnvironment) => Page;
 export declare type StatusPageProvider = (status: number) => Page;
 export declare type MiddleWare = (environment: RequestEnvironment) => void;
@@ -104,7 +104,6 @@ export class Dendro {
 		if (this.server) {
 			Dendro.logger.Info("Serving on http://localhost:" + this.port.toString());
 
-			/////////////////////////////////////
 
 			for await (const req of this.server) {
 				let env: RequestEnvironment = new RequestEnvironment(req, this);
@@ -118,13 +117,13 @@ export class Dendro {
 						await this.beforeRequest[i](env);
 					}
 
-					req.respond((await this.router.RouteRequest(env)).getResponse());
+					req.respond((await this.router.routeRequest(env)).getResponse());
 
 					for (let i = 0; i < this.afterRequest.length; i++) {
 						await this.afterRequest[i](env);
 					}
 				} catch (error) {
-					this.handleError(error);
+					this.handleError(error, env);
 					req.respond(this.onErrorPager(env).getResponse());
 				}
 			}
@@ -156,7 +155,7 @@ export class Dendro {
 	private handleError(error: Error) {
 		if (this.logAllErrors) this._logger?.Log(error);
 
-		if (this.errorHandler != null) this.errorHandler(error);
+		if (this.errorHandler != null) this.errorHandler(error,env);
 		else {
 			throw error;
 		}

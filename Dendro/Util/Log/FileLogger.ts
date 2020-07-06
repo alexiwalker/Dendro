@@ -4,31 +4,24 @@ import {ILogger} from "./ILogger.ts";
 export class FileLogger implements ILogger {
 	outputFileName!: string;
 
-	Critical(data: string): void {
+	Critical(data: any): void {
 		//File.write("Critical.log", data);
 	}
 
-	Error(data: string): void {
+	Error(data: any): void {
 		//File.write("Error.log", data);
 	}
 
-	Info(data: string): void {
+	Info(data: any): void {
 		//File.write("Critical.log", data);
 	}
 
-	Log(data: string): void;
-	Log(data: Error): void;
-	Log(data: string | Error): void {
-		if (typeof data === "string") {
-			//File.write("Critical.log", data);
-		} else if (data instanceof Error) {
-			//File.write("Critical.log", data);
-		}
+	Log(data: any): void {
 	}
 
-	Warning(data: string): void {
+	Warning(data: any): void {
 	}
 
-	Debug(data: string): void {
+	Debug(data: any): void {
 	}
 }

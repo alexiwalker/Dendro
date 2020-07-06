@@ -16,6 +16,6 @@ export interface IRouter {
 	 * @param requestEnvironment
 	 * @constructor
 	 */
-	RouteRequest(requestEnvironment: RequestEnvironment): Promise<Page>;
+	routeRequest(requestEnvironment: RequestEnvironment): Promise<Page>;
 }
 

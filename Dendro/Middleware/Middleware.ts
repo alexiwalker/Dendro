@@ -25,9 +25,9 @@ export var DecodeBodyJSON: MiddleWare = async function (env: RequestEnvironment)
 
 		let obj = JSON.parse(bodyString);
 
-		for (let key in obj) {
-			Dendro.logger.Debug(key + " " + obj[key]);
-		}
+		// for (let key in obj) {
+		// 	Dendro.logger.Debug(key + " " + obj[key]);
+		// }
 
 		env.environmentVars.set("body", obj);
 	} catch (e) {

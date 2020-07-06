@@ -6,6 +6,7 @@ import {Env} from "./Dendro/Util/Env.ts";
 import {HomePage, TemplatedHomePage} from "./Application/Pages/Home.ts";
 
 import {Route} from "./Dendro/Routes/Route.ts";
+import {RequestEnvironment} from "./Dendro/Util/RequestEnvironment.ts";
 
 
 //8000 if no env[PORT}, otherwise use env value
@@ -20,7 +21,9 @@ Dendro.setTemplatePath(Deno.env.get("TEMPLATES") as string);
 
 router.addStaticDefaults()
 
-router.add(Route.url("/"), HomePage.new, [
+Dendro.setTemplatePath("Application/Templates");
+
+router.serveStatic("/", "index.html", [
 	//An example of inline declared middledware
 	() => {
 		Dendro.logger.Info("Home Page accessed")
@@ -29,10 +32,9 @@ router.add(Route.url("/"), HomePage.new, [
 	DecodeBodyJSON
 ]);
 
-router.url("/template", TemplatedHomePage.new)
+App.usesErrorHandler((e: Error, env:RequestEnvironment) => {
 
-App.usesErrorHandler((e: Error) => {
-	App.logger.Error(e.message)
+	App.logger.Error(`A request to ${env.url} threw an an error: ${e.message}`)
 })
 
 App.usesLogger(new ConsoleLogger());

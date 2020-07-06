@@ -15,8 +15,7 @@ export class HomePage extends Page {
 	}
 
 	public getResponse(): Object {
-		var f = IO.getAssetPath(Dendro.getAssetPath(), "/index.html")
-		let bodycontent  = Deno.readTextFileSync(f)
+	let bodycontent = Template.createSync("/index.html").render();
 
 		return {body: bodycontent, status: 200};
 	}
@@ -37,7 +36,7 @@ export class TemplatedHomePage extends Page {
 	}
 
 	public getResponse(): Object {
-		let bodycontent = Template.CreateSync("/tplHome.tpl").Render({variableA:"ABCDEFG"})
+		let bodycontent = Template.createSync("/tplHome.tpl").render({variableA:"ABCDEFG"})
 		return {body: bodycontent, status: 200};
 	}
 
