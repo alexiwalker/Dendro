@@ -3,19 +3,19 @@ import {ILogger} from "./ILogger.ts";
 import {Env} from "../Env.ts";
 
 export class ConsoleLogger implements ILogger {
-	Critical(data: any): void {
+	critical(data: any): void {
 		console.log("Critical Log: " + data);
 	}
 
-	Error(data: any): void {
+	error(data: any): void {
 		console.log("Error Logged: " + data);
 	}
 
-	Info(data: any): void {
+	info(data: any): void {
 		console.log("Info: " + data);
 	}
 
-	Log(data: any): void {
+	log(data: any): void {
 		if (typeof data === "string") {
 			console.log(data);
 		} else if (data instanceof Error) {
@@ -29,11 +29,11 @@ export class ConsoleLogger implements ILogger {
 		}
 	}
 
-	Warning(data: any): void {
+	warning(data: any): void {
 		console.log("Warning: " + data);
 	}
 
-	Debug(data: any): void {
+	debug(data: any): void {
 		if (Env.Numeric("DEBUG", 0) > 0)
 			console.log("Debug: " + data);
 	}

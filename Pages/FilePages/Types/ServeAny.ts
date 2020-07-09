@@ -56,7 +56,7 @@ export class ServeAny extends Page {
 				headers: this.headers
 			}
 		} catch (error) {
-			Dendro.logger.Warning(`404 on static file: ${f}`)
+			Dendro.logger.warning(`404 on static file: ${f}`)
 			return Dendro.Page400(404);
 		}
 
