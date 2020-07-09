@@ -7,7 +7,12 @@ import {IRouter, RouteList, RouteValidator} from "./IRouter.ts";
 import {MiddleWare, PageProvider} from "../Dendro.ts";
 import {RequestEnvironment} from "../Util/RequestEnvironment.ts";
 import {Route} from "./Route.ts";
-import {contentTypeAny, contentTypeCSS, contentTypeJS, contentTypeStatic} from "../Pages/FilePages/ContentTypes.ts";
+import {
+	contentStaticWithKnownMime,
+	contentTypeCSS,
+	contentTypeJS,
+	contentWithoutKnownMime
+} from "../Pages/FilePages/ContentTypes.ts";
 
 import {ServeAny} from "../Pages/FilePages/Types/ServeAny.ts";
 
@@ -27,6 +32,7 @@ export const Delete: string = "DELETE";
  */
 export class BasicRouter implements IRouter {
 	routeList: RouteList = new Array<Route>();
+	staticAssets: string = ""
 
 	constructor() {
 	}
@@ -150,7 +156,7 @@ export class BasicRouter implements IRouter {
 	 * @param requestEnvironment
 	 * @constructor
 	 */
-	async RouteRequest(requestEnvironment: RequestEnvironment): Promise<Page> {
+	async routeRequest(requestEnvironment: RequestEnvironment): Promise<Page> {
 		for (let route of this.routeList) {
 			if (route.Validate(requestEnvironment)) {
 				await route.ServeRoutedMiddleware(requestEnvironment)
@@ -162,14 +168,42 @@ export class BasicRouter implements IRouter {
 	}
 
 	/**
-	 * Adds default static file handling for requests where the URL ends with .css, .js, or standard image types.
+	 * Adds default static file handling for requests where the URL ends with a filetype (/something.file)
 	 * A file with an extension that is not listed will be served with no content-type headers as a uint8 array and its original file name
 	 */
 	public addStaticDefaults(): BasicRouter {
-		this.add(contentTypeCSS, ServeAny.new);
-		this.add(contentTypeJS, ServeAny.new);
-		this.add(contentTypeStatic, ServeAny.new)
-		this.add(contentTypeAny, ServeAny.new)
+
+		let provider: PageProvider = (environment: RequestEnvironment) => {
+			return ServeAny.new(environment, this.staticAssets)
+		}
+
+		this.add(contentTypeCSS, provider);
+		this.add(contentTypeJS, provider);
+		this.add(contentStaticWithKnownMime, provider);
+		this.add(contentWithoutKnownMime, provider);
 		return this;
+	}
+
+	/**
+	 * Allow a url without a filetype to be served directly by a static file
+	 * @param url: string url accessed
+	 * @param assetPath: string static asset to serve
+	 * @param middleWare: Middleware[] to serve prior to request
+	 * @param checkUrlParams: boolean whether url query parameters affect routing
+	 */
+	public serveStatic(url: string, assetPath: string, middleWare: MiddleWare[] = [], checkUrlParams: boolean = false) {
+		let provider: PageProvider = (environment: RequestEnvironment) => {
+			return ServeAny.new(environment, this.staticAssets, assetPath)
+		}
+
+		this.url(url, provider, checkUrlParams, middleWare);
+	}
+
+	/**
+	 * Set the path to the static assets folder
+	 * @param path: string path of the folder
+	 */
+	public setStaticAssetPath(path: string) {
+		this.staticAssets = path;
 	}
 }

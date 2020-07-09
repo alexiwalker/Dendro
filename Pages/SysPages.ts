@@ -3,7 +3,6 @@ import {Page} from "./mod.ts";
 /**
  * A default 400s status code page
  * This is used by default when no route can be found for a given url
- * todo: a way to set custom 400 page HTML
  */
 export class Page4XX extends Page {
 	statusCode: number = 400;
@@ -28,8 +27,6 @@ export class Page4XX extends Page {
 /**
  * A default 500s status code page.
  * This is used by default when the server encounters some uncaught error while serving another page
- *
- * todo: a way to set custom 500 page HTML
  */
 export class Page5XX extends Page {
 	statusCode: number = 500;

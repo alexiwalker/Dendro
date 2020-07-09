@@ -23,21 +23,28 @@ export class ServeAny extends Page {
 	private filename: string;
 	private env: RequestEnvironment;
 	private headers: Map<string, string>;
-
-	constructor(env: RequestEnvironment) {
+	private basePath:string;
+	constructor(env: RequestEnvironment, basepath:string="", filepath:string = "") {
 		super();
 		this.env = env;
-		this.filename = env.request.url;
+
+		if(filepath=="")
+			this.filename = env.request.url;
+		else {
+				this.filename = filepath
+		}
+
 		this.headers = env.Headers;
-
+		this.basePath = basepath
 	}
 
-	public static new(env: RequestEnvironment) {
-		return new ServeAny(env)
+	public static new(env: RequestEnvironment, path:string,filepath:string="") {
+		return new ServeAny(env,path,filepath)
 	}
+
 
 	public getResponse(): Object {
-		let f = IO.getAssetPath(this.env.parent.getAssetPath(), this.filename);
+		let f = `${this.basePath}/${this.filename}`
 		let fileType = `.${this.filename.split(".").reverse()[0]}`
 		if (MimeTypes.has(fileType)) {
 			this.headers.set("Content-Type", MimeTypes.get(fileType) as string)
@@ -49,7 +56,7 @@ export class ServeAny extends Page {
 				headers: this.headers
 			}
 		} catch (error) {
-			Dendro.logger.Warning(`404 on static file: ${f}`)
+			Dendro.logger.warning(`404 on static file: ${f}`)
 			return Dendro.Page400(404);
 		}
 

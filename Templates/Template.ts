@@ -27,7 +27,7 @@ export class Template {
 	/**
 	 * Async factory to allow async reading of template from the filesystem
 	 */
-	public static async CreateAsync(file: string): Promise<Template> {
+	public static async createAsync(file: string): Promise<Template> {
 		let t = new Template(file, Dendro.templatePath);
 
 		t.content = await Deno.readTextFile(t._baseFile)
@@ -37,14 +37,14 @@ export class Template {
 	/**
 	 * Synchronous factory with a blocking file IO operation. Not recommended. May throw if file is not found or could not be read
 	 */
-	public static CreateSync(file: string): Template {
+	public static createSync(file: string): Template {
 		let t = new Template(file, Dendro.templatePath);
 
 		t.content = Deno.readTextFileSync(t._baseFile)
 		return t;
 	}
 
-	public Render(model: Object): string {
+	public render(model: Object={}): string {
 		this.content = render(this.content, model) ?? this.content;
 		return this.content;
 	}
