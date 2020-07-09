@@ -138,3 +138,7 @@ an example minimal application could be created and run as such:
     await App.Serve();
 
 This would serve any files placed in "Application/Assets". Any other requests would return a 404 response.
+=======
+
+--todo: rewriting this now that I have a better idea of how it will be structured
+
