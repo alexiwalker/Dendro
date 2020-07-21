@@ -3,7 +3,7 @@ A flexible web framework for the Deno Typescript runtime
 
 ### About
 
-A dendro application has \#\# main components: The Dendro object itself, A router object (implementing IRouter), A logger object (implementing ILogger), any number of object inheriting from Page
+A dendro application has 3 main components: The Dendro object itself, A router object (implementing IRouter), A logger object (implementing ILogger), any number of object inheriting from Page
 
 A router takes a RequestEnvironment and returns a page. A RequestEnvironment (RE from here-on) includes the request itself and other data about that request. After the page is returned, it generates the response.
 
